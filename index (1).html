@@ -1,0 +1,498 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SKAYLL</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+/* Layout: one long dark-red page, sticky nav, hero with keycaps, builder as the centrepiece, chat dock bottom-right */
+:root{--bg:#0a0507;--surface:#140a0d;--surface2:#1d0f13;--line:#341a20;--red:#e11d2e;--red2:#ff5566;--fg:#f6ecec;--muted:#a88c91;--ok:#4ade80;
+--display:'Unbounded','Arial Black',sans-serif;--body:'Manrope',system-ui,sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--fg);font:400 16px/1.6 var(--body);margin:0;padding-block:0;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));overflow-x:hidden}
+#bg{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+main,header,footer{position:relative;z-index:1;max-width:1180px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);line-height:1.1;margin:0;text-wrap:balance}
+h2{font-size:clamp(26px,4.4vw,44px);font-weight:700;letter-spacing:-.02em}
+h3{font-size:18px;font-weight:500}
+p{margin:0}
+a{color:inherit}
+.mono{font-family:var(--mono)}
+.eyebrow{font:700 12px var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--red2)}
+.muted{color:var(--muted)}
+section{padding-block:72px}
+.sec-head{display:grid;gap:12px;margin-bottom:36px;max-width:680px}
+.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--red);background:var(--red);color:#fff;padding:13px 22px;font:700 14px var(--body);border-radius:10px;cursor:pointer;text-decoration:none;transition:transform .15s,box-shadow .2s,background .2s;box-shadow:0 5px 0 #8c0f1b}
+.btn:hover{transform:translateY(2px);box-shadow:0 3px 0 #8c0f1b}
+.btn:active{transform:translateY(5px);box-shadow:0 0 0 #8c0f1b}
+.btn.ghost{background:transparent;color:var(--fg);border-color:var(--line);box-shadow:0 5px 0 var(--line)}
+.btn.ghost:hover{border-color:var(--red)}
+:focus-visible{outline:2px solid var(--red2);outline-offset:3px}
+/* nav */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;background:linear-gradient(var(--bg) 70%,transparent)}
+.logo{font:900 20px var(--display);letter-spacing:.04em;text-decoration:none}
+.logo b{color:var(--red)}
+.nav nav{display:flex;gap:22px;font-size:14px;color:var(--muted)}
+.nav nav a{text-decoration:none}.nav nav a:hover{color:var(--fg)}
+.nav-r{display:flex;gap:10px;align-items:center}
+.nav .btn{padding:9px 16px;box-shadow:0 3px 0 #8c0f1b}
+@media(max-width:820px){.nav nav{display:none}}
+/* hero */
+.hero{padding-top:56px;display:grid;grid-template-columns:1.15fr .85fr;gap:40px;align-items:center}
+.hero h1{font-size:clamp(34px,6.2vw,72px);font-weight:900;letter-spacing:-.03em}
+.hero h1 em{font-style:normal;color:var(--red);text-shadow:0 0 40px rgba(225,29,46,.55)}
+.hero p.lead{font-size:18px;color:var(--muted);margin:22px 0 30px;max-width:520px}
+.cta{display:flex;gap:14px;flex-wrap:wrap}
+.keys{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;perspective:700px}
+.key{width:clamp(54px,9vw,84px);aspect-ratio:1;display:grid;place-items:center;font:900 clamp(22px,4vw,34px) var(--display);background:linear-gradient(#2a1318,#1a0b0f);border:1px solid #4a232b;border-radius:14px;box-shadow:0 8px 0 #0d0508,0 8px 24px rgba(225,29,46,.18);animation:press 3.6s infinite;animation-delay:calc(var(--i)*.35s);cursor:pointer;user-select:none}
+.key.on,.key:active{transform:translateY(7px);box-shadow:0 1px 0 #0d0508,0 0 30px rgba(225,29,46,.7);color:var(--red2);animation:none}
+@keyframes press{0%,12%,100%{transform:none}4%{transform:translateY(7px);box-shadow:0 1px 0 #0d0508,0 0 28px rgba(225,29,46,.8);color:var(--red2)}}
+.keys-cap{text-align:center;margin-top:22px;font:12px var(--mono);color:var(--muted)}
+.keywide{width:clamp(150px,26vw,230px);aspect-ratio:auto;height:clamp(54px,9vw,84px);font-size:14px;letter-spacing:.2em}
+@media(max-width:860px){.hero{grid-template-columns:1fr}}
+/* marquee */
+.marq{overflow:hidden;border-block:1px solid var(--line);padding:14px 0;margin-top:30px;mask:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)}
+.marq div{display:flex;gap:40px;width:max-content;animation:mq 38s linear infinite;font:700 13px var(--mono);letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+.marq span::before{content:"✦ ";color:var(--red)}
+@keyframes mq{to{transform:translateX(-50%)}}
+/* generic cards */
+.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px;display:grid;gap:10px;align-content:start;transition:border-color .2s,transform .2s}
+.card:hover{border-color:var(--red);transform:translateY(-3px)}
+.card .ic{width:40px;height:40px;border-radius:10px;background:var(--surface2);display:grid;place-items:center;font:700 18px var(--mono);color:var(--red2);border:1px solid var(--line)}
+.card p{color:var(--muted);font-size:14px}
+/* builder */
+.builder{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:20px;align-items:start}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px}
+.tabs{display:inline-flex;background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:4px;margin-bottom:20px}
+.tab{background:none;border:0;color:var(--muted);font:700 14px var(--body);padding:10px 22px;border-radius:9px;cursor:pointer}
+.tab[aria-selected=true]{background:var(--red);color:#fff}
+.step{margin-bottom:24px}
+.step h3{font:700 12px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--red2);margin-bottom:12px;display:flex;justify-content:space-between;gap:8px}
+.step h3 small{color:var(--muted);font-weight:400;letter-spacing:0;text-transform:none}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{position:relative}
+.chip input{position:absolute;opacity:0;inset:0;cursor:pointer;margin:0}
+.chip span{display:inline-flex;gap:8px;align-items:center;padding:9px 14px;border:1px solid var(--line);border-radius:10px;background:var(--surface2);font-size:14px;transition:.15s;box-shadow:0 3px 0 #0d0508}
+.chip span i{font:normal 11px var(--mono);color:var(--muted)}
+.chip:hover span{border-color:#6a2a34}
+.chip input:checked+span{background:rgba(225,29,46,.16);border-color:var(--red);color:#fff;transform:translateY(2px);box-shadow:0 1px 0 #0d0508}
+.chip input:checked+span i{color:var(--red2)}
+.chip input:focus-visible+span{outline:2px solid var(--red2);outline-offset:2px}
+.swatches{display:flex;gap:10px;flex-wrap:wrap}
+.sw{width:34px;height:34px;border-radius:50%;border:2px solid var(--line);cursor:pointer;padding:0}
+.sw[aria-pressed=true]{outline:2px solid var(--fg);outline-offset:2px}
+.addrow{display:flex;gap:8px;margin-top:12px}
+input[type=text],textarea{width:100%;background:var(--surface2);border:1px solid var(--line);color:var(--fg);border-radius:10px;padding:11px 14px;font:14px var(--body)}
+input[type=text]:focus,textarea:focus{outline:2px solid var(--red2);border-color:transparent}
+input[type=range]{width:100%;accent-color:var(--red)}
+.side{position:sticky;top:76px;display:grid;gap:16px}
+.price{font:900 clamp(30px,5vw,44px) var(--display);color:var(--red2);font-variant-numeric:tabular-nums}
+.price small{font:12px var(--mono);color:var(--muted);display:block;margin-top:4px}
+.sum{display:grid;gap:6px;font-size:13px;margin:14px 0;max-height:190px;overflow:auto;padding-right:4px}
+.sum div{display:flex;justify-content:space-between;gap:10px;border-bottom:1px dashed var(--line);padding-bottom:5px}
+.sum div b{font:500 12px var(--mono);color:var(--muted);white-space:nowrap}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row .btn{flex:1;justify-content:center;min-width:140px}
+/* live previews */
+.browser{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#0d0608;font-size:11px}
+.bar{display:flex;gap:6px;align-items:center;padding:8px 10px;background:var(--surface2)}
+.bar i{width:8px;height:8px;border-radius:50%;background:#4a232b}
+.bar span{margin-left:8px;font:10px var(--mono);color:var(--muted);background:#0d0608;padding:3px 10px;border-radius:6px;flex:1;overflow:hidden;white-space:nowrap}
+.pv{padding:12px;display:grid;gap:8px;max-height:300px;overflow:auto;--ac:var(--red)}
+.pv .b{border:1px solid var(--line);border-radius:8px;padding:9px 11px;background:var(--surface);animation:pop .4s both}
+.pv .b b{color:var(--ac);font:700 10px var(--mono);letter-spacing:.1em;text-transform:uppercase;display:block}
+.pv .b.hero2{background:linear-gradient(135deg,var(--ac),#1a0b0f);border:0;padding:16px}
+.pv .b.hero2 b{color:#fff}
+@keyframes pop{from{opacity:0;transform:scale(.94) translateY(6px)}}
+.phone{width:min(260px,100%);margin:0 auto;border:2px solid #4a232b;border-radius:26px;background:#0d0608;overflow:hidden}
+.phone .top{background:var(--surface2);padding:10px 14px;font:700 12px var(--body);display:flex;gap:8px;align-items:center}
+.phone .top i{width:22px;height:22px;border-radius:50%;background:var(--red);display:inline-block}
+.msgs{padding:12px;display:grid;gap:6px;min-height:200px;max-height:260px;overflow:auto;align-content:start}
+.m{max-width:85%;padding:7px 10px;border-radius:10px;font-size:12px;animation:pop .3s both;line-height:1.4}
+.m.u{justify-self:end;background:var(--red);color:#fff;border-bottom-right-radius:3px}
+.m.b{background:var(--surface2);border-bottom-left-radius:3px}
+.cmds{display:flex;flex-wrap:wrap;gap:5px;padding:8px 10px;border-top:1px solid var(--line)}
+.cmds button{background:var(--surface2);border:1px solid var(--line);color:var(--fg);border-radius:6px;font:11px var(--mono);padding:4px 8px;cursor:pointer}
+.cmds button:hover{border-color:var(--red)}
+@media(max-width:900px){.builder{grid-template-columns:1fr}.side{position:static}}
+/* showcase / steps / pricing / faq */
+.shots{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.shot{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--surface)}
+.shot .scr{height:170px;position:relative;overflow:hidden;background:#0d0608}
+.shot .cap{padding:14px 16px;display:grid;gap:3px}
+.shot .cap span{font:11px var(--mono);color:var(--red2);letter-spacing:.1em}
+.shot .cap p{font-size:13px;color:var(--muted)}
+.ln{position:absolute;height:8px;border-radius:4px;background:var(--line)}
+.ln.r{background:var(--red)}
+.s1 .ln{animation:grow 3s infinite alternate ease-in-out}
+@keyframes grow{from{transform:scaleX(.4);transform-origin:left}to{transform:scaleX(1);transform-origin:left}}
+.orb{position:absolute;border-radius:50%;background:radial-gradient(var(--red),transparent 70%);animation:fl 6s infinite alternate ease-in-out}
+@keyframes fl{to{transform:translate(50px,30px) scale(1.3)}}
+.tl{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));counter-reset:s}
+.tl .card::before{counter-increment:s;content:"0" counter(s);font:700 13px var(--mono);color:var(--red2)}
+.plans{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.plan{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:26px;display:grid;gap:14px;align-content:start}
+.plan.hot{border-color:var(--red);box-shadow:0 0 50px rgba(225,29,46,.18)}
+.plan ul{margin:0;padding:0;list-style:none;display:grid;gap:7px;font-size:14px;color:var(--muted)}
+.plan li::before{content:"→ ";color:var(--red2)}
+.plan .p{font:900 28px var(--display)}
+details{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:10px}
+summary{cursor:pointer;font-weight:700}
+details p{color:var(--muted);margin-top:10px;font-size:14px}
+.wall{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:40;display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+.fab{width:56px;height:56px;border-radius:16px;background:var(--red);border:0;color:#fff;font:700 22px var(--mono);cursor:pointer;box-shadow:0 6px 0 #8c0f1b,0 0 30px rgba(225,29,46,.5)}
+.fab.sm{width:44px;height:44px;font-size:14px;background:var(--surface2);border:1px solid var(--line);box-shadow:0 4px 0 #0d0508}
+.chat{width:min(340px,calc(100vw - 32px));background:var(--surface);border:1px solid var(--red);border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.chat .hd{padding:14px 16px;background:var(--surface2);display:flex;justify-content:space-between;align-items:center;font-weight:700}
+.chat .hd small{display:block;font:11px var(--mono);color:var(--ok);font-weight:400}
+.chat .msgs{min-height:240px;max-height:300px}
+.chat form{display:flex;gap:8px;padding:10px;border-top:1px solid var(--line)}
+.chat form button{background:var(--red);border:0;color:#fff;border-radius:10px;padding:0 14px;cursor:pointer;font-weight:700}
+.quick{display:flex;flex-wrap:wrap;gap:6px;padding:0 10px 10px}
+.quick button{background:none;border:1px solid var(--line);color:var(--fg);border-radius:20px;padding:5px 11px;font-size:12px;cursor:pointer}
+.quick button:hover{border-color:var(--red)}
+footer{padding-block:48px;border-top:1px solid var(--line);display:flex;justify-content:space-between;flex-wrap:wrap;gap:20px;color:var(--muted);font-size:14px}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,40px);background:var(--fg);color:var(--bg);padding:10px 18px;border-radius:10px;font-weight:700;font-size:14px;opacity:0;transition:.3s;z-index:60;pointer-events:none}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
+</style>
+<canvas id="bg" aria-hidden="true"></canvas>
+<header>
+<div class="nav">
+<a class="logo" href="#top">SKAY<b>LL</b></a>
+<nav><a href="#builder">Конструктор</a><a href="#features">Возможности</a><a href="#showcase">Превью</a><a href="#process">Процесс</a><a href="#plans">Тарифы</a><a href="#faq">FAQ</a><a href="#contacts">Контакты</a><a href="terms.html">Оферта</a><a href="privacy.html">Политика</a></nav>
+<div class="nav-r"><button class="btn ghost" id="wpBtn" style="padding:9px 14px;box-shadow:0 3px 0 var(--line)" title="Сменить обои">Обои: <span id="wpName">частицы</span></button><a class="btn" href="https://t.me/skayllik" target="_blank" rel="noopener">@skayllik</a></div>
+</div>
+</header>
+<main id="top">
+<section class="hero">
+<div>
+<p class="eyebrow">Студия сайтов и ботов</p>
+<h1 style="margin-top:14px">Сайты и боты, <em>собранные под вас</em></h1>
+<p class="lead">Выберите функции, команды и стиль в конструкторе. Цена и превью меняются сразу. Затем отправьте заказ в Telegram или в чат на сайте.</p>
+<div class="cta"><a class="btn" href="#builder">Открыть конструктор</a><a class="btn ghost" href="#showcase">Посмотреть примеры</a></div>
+</div>
+<div>
+<div class="keys" id="keys" aria-label="Клавиши SKAYLL"></div>
+<div class="keys" style="margin-top:12px"><div class="key keywide" id="enter">ENTER ↵</div></div>
+<p class="keys-cap">нажимайте клавиши — они работают и с клавиатуры</p>
+</div>
+</section>
+<div class="marq" aria-hidden="true"><div id="mq"></div></div>
+
+<section id="builder">
+<div class="sec-head"><p class="eyebrow">Конструктор</p><h2>Соберите свой проект за пару минут</h2><p class="muted">Отмечайте всё, что нужно. Цена в рублях ориентировочная, точную сумму мы называем после обсуждения в Telegram.</p></div>
+<div class="builder">
+<div class="panel">
+<div class="tabs" role="tablist"><button class="tab" role="tab" id="tabSite" aria-selected="true">Сайт</button><button class="tab" role="tab" id="tabBot" aria-selected="false">Бот</button></div>
+<div id="opts"></div>
+</div>
+<aside class="side">
+<div class="panel">
+<p class="eyebrow">Ваш проект</p>
+<div class="tabs" id="payTabs" style="margin:12px 0 8px"><button class="tab" id="payOnce" aria-selected="true" type="button">Навсегда</button><button class="tab" id="payMonth" aria-selected="false" type="button">Помесячно</button></div><div class="chips" id="perRow" hidden style="margin-bottom:8px"></div>
+<div class="price" id="price">0 ₽<small id="eta">срок: —</small></div>
+<div class="sum" id="sum"></div>
+<div class="row"><button class="btn" id="order">Заказать в Telegram</button><button class="btn ghost" id="toChat">Обсудить в чате</button></div>
+<div class="row" style="margin-top:10px"><button class="btn ghost" id="copy">Скопировать ТЗ</button><button class="btn ghost" id="reset">Сбросить</button></div>
+</div>
+<div class="panel"><p class="eyebrow" style="margin-bottom:12px">Живое превью</p><div id="preview"></div></div>
+</aside>
+</div>
+</section>
+
+<section id="features">
+<div class="sec-head"><p class="eyebrow">Возможности</p><h2>Что мы умеем делать</h2></div>
+<div class="grid" id="featGrid"></div>
+</section>
+
+<section id="showcase">
+<div class="sec-head"><p class="eyebrow">Превью</p><h2>Как это выглядит</h2><p class="muted">Это примеры стилей и интерфейсов, а не реальные проекты клиентов.</p></div>
+<div class="shots">
+<div class="shot"><div class="scr s1"><span class="ln r" style="left:16px;top:20px;width:40%"></span><span class="ln" style="left:16px;top:40px;width:70%"></span><span class="ln" style="left:16px;top:56px;width:55%"></span><span class="ln r" style="left:16px;top:90px;width:30%;height:22px;border-radius:6px"></span><span class="ln" style="right:16px;top:20px;width:25%;height:110px;border-radius:10px"></span></div><div class="cap"><span>ЛЕНДИНГ · АНИМАЦИЯ</span><h3>Одностраничник</h3><p>Герой-блок, преимущества, форма заявки.</p></div></div>
+<div class="shot"><div class="scr"><span class="orb" style="width:120px;height:120px;left:20px;top:20px"></span><span class="orb" style="width:90px;height:90px;right:30px;bottom:10px;animation-delay:-3s"></span></div><div class="cap"><span>ФОН · ГРАДИЕНТ</span><h3>Живые обои</h3><p>Плавные свечения вместо плоского фона.</p></div></div>
+<div class="shot"><div class="scr" id="shotShop" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:14px"></div><div class="cap"><span>МАГАЗИН · КОРЗИНА</span><h3>Интернет-магазин</h3><p>Каталог, фильтры, оплата, личный кабинет.</p></div></div>
+<div class="shot"><div class="scr" style="padding:14px"><div class="msgs" style="padding:0;max-height:none" id="shotBot"></div></div><div class="cap"><span>TELEGRAM-БОТ · ДИАЛОГ</span><h3>Бот-консультант</h3><p>Команды, кнопки, оплата прямо в чате.</p></div></div>
+<div class="shot"><div class="scr" id="shotChart" style="display:flex;align-items:flex-end;gap:8px;padding:16px"></div><div class="cap"><span>АДМИН-ПАНЕЛЬ · СТАТИСТИКА</span><h3>Панель управления</h3><p>Заказы, пользователи, рассылки.</p></div></div>
+<div class="shot"><div class="scr" style="display:grid;place-items:center"><div class="key" style="animation-delay:0s">⌘</div></div><div class="cap"><span>UI · КЛАВИШИ</span><h3>Тактильные кнопки</h3><p>Кнопки с нажатием, как на механической клавиатуре.</p></div></div>
+</div>
+</section>
+
+<section id="process">
+<div class="sec-head"><p class="eyebrow">Процесс</p><h2>Как проходит заказ</h2></div>
+<div class="tl">
+<div class="card"><h3>Конструктор</h3><p>Выбираете функции, команды и стиль.</p></div>
+<div class="card"><h3>Обсуждение</h3><p>Пишете в Telegram или в чат, уточняем детали и цену.</p></div>
+<div class="card"><h3>Разработка</h3><p>Показываем промежуточные версии, вносим правки.</p></div>
+<div class="card"><h3>Запуск</h3><p>Размещаем, подключаем домен и оплату, передаём доступы.</p></div>
+<div class="card"><h3>Поддержка</h3><p>Исправляем ошибки и добавляем функции после запуска.</p></div>
+</div>
+</section>
+
+<section id="plans">
+<div class="sec-head"><p class="eyebrow">Тарифы</p><h2>Готовые пакеты</h2><p class="muted">Или соберите свой в конструкторе выше. Цены ориентировочные.</p></div>
+<div class="plans">
+<div class="plan"><h3>Старт</h3><div class="p">от 1 000 ₽</div><p class="muted" style="font-size:13px;margin-top:-8px">или от 190 ₽/мес</p><ul><li>Лендинг или простой бот</li><li>До 5 блоков или команд</li><li>Форма заявки</li><li>Адаптив под телефон</li></ul><button class="btn ghost" data-plan="Старт">Выбрать</button></div>
+<div class="plan hot"><h3>Бизнес</h3><div class="p">от 3 000 ₽</div><p class="muted" style="font-size:13px;margin-top:-8px">или от 360 ₽/мес</p><ul><li>Многостраничный сайт или бот с БД</li><li>Админ-панель</li><li>Оплата онлайн</li><li>Уведомления в Telegram</li><li>Аналитика</li></ul><button class="btn" data-plan="Бизнес">Выбрать</button></div>
+<div class="plan"><h3>Максимум</h3><div class="p">от 7 000 ₽</div><p class="muted" style="font-size:13px;margin-top:-8px">или от 840 ₽/мес</p><ul><li>Магазин, личный кабинет, CRM</li><li>Бот с ИИ и рассылками</li><li>Свой дизайн и анимации</li><li>Приоритетная поддержка</li></ul><button class="btn ghost" data-plan="Максимум">Выбрать</button></div>
+</div>
+</section>
+
+<section id="faq">
+<div class="sec-head"><p class="eyebrow">FAQ</p><h2>Частые вопросы</h2></div>
+<details><summary>Как оформить заказ?</summary><p>Соберите проект в конструкторе и нажмите «Заказать в Telegram». Заявка откроется в чате с @skayllik. Можно также написать в чат на сайте.</p></details>
+<details><summary>Цена в конструкторе окончательная?</summary><p>Нет, это оценка. Точную стоимость и сроки мы называем после обсуждения задачи.</p></details>
+<details><summary>Можно добавить функцию, которой нет в списке?</summary><p>Да. В конструкторе есть поле «свои пожелания», а свои команды для бота можно добавить вручную.</p></details>
+<details><summary>На какие платформы делаете ботов?</summary><p>Telegram, Discord, VK и WhatsApp. Выберите платформу в конструкторе бота.</p></details>
+<details><summary>Можно купить не навсегда, а платить помесячно?</summary><p>Да. В конструкторе переключите «Навсегда» на «Помесячно» и выберите срок: при оплате на 3, 6 или 12 месяцев вперёд действует скидка 5%, 10% или 15%.</p></details>
+<details><summary>Что после запуска?</summary><p>Передаём доступы и инструкцию. Поддержка и доработки обсуждаются отдельно.</p></details>
+</section>
+<section id="contacts">
+<div class="sec-head"><p class="eyebrow">Контакты</p><h2>Поддержка</h2><p class="muted">Отвечаем в Telegram, по email и в чате на сайте.</p></div>
+<div class="grid">
+<div class="card"><h3>Telegram</h3><p><a href="https://t.me/skayllik" target="_blank" rel="noopener" style="color:var(--red2)">@skayllik</a></p></div>
+<div class="card"><h3>Email</h3><p><a href="mailto:skayllik61@gmail.com" style="color:var(--red2)">skayllik61@gmail.com</a></p></div>
+<div class="card"><h3>Чат на сайте</h3><p>Кнопка ✉ в правом нижнем углу.</p></div>
+</div>
+</section>
+</main>
+<footer><div><div class="logo">SKAY<b>LL</b></div><p style="margin-top:8px">Сайты и боты под заказ</p></div>
+<div><p>Telegram: <a href="https://t.me/skayllik" target="_blank" rel="noopener" style="color:var(--red2)">@skayllik</a></p><p>Email: <a href="mailto:skayllik61@gmail.com" style="color:var(--red2)">skayllik61@gmail.com</a></p></div>
+<div><p><a href="terms.html">Публичная оферта</a></p><p><a href="privacy.html">Политика конфиденциальности</a></p></div></footer>
+
+<div class="wall">
+<div class="chat" id="chat" hidden>
+<div class="hd"><div>Чат SKAYLL<small>● онлайн-помощник</small></div><button class="fab sm" id="chatX" aria-label="Закрыть">×</button></div>
+<div class="msgs" id="cm"></div>
+<div class="quick" id="cq"></div>
+<form id="cf"><input type="text" id="ci" placeholder="Напишите сообщение" autocomplete="off"><button>→</button></form>
+</div>
+<button class="fab" id="chatBtn" aria-label="Открыть чат">✉</button>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const TG='https://t.me/skayllik';
+const fmt=n=>n.toLocaleString('ru-RU').replace(/ /g,' ')+' ₽';
+let toastT;const toast=t=>{const e=$('#toast');e.textContent=t;e.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>e.classList.remove('show'),2200)};
+const K=0.2;const I=(id,label,price,days,hint,g)=>({id,label,price:Math.round(price*K/10)*10,days:days||0,hint:hint||'',g:g||''});
+const CFG={
+site:{name:'Сайт',steps:[
+{k:'type',t:'Тип сайта',kind:'radio',items:[I('land','Лендинг',4000,3),I('shop','Интернет-магазин',14000,12),I('card','Сайт-визитка',3000,2),I('corp','Корпоративный',12000,10),I('port','Портфолио',4500,4),I('blog','Блог / медиа',7000,6),I('book','Запись / бронирование',10000,8),I('edu','Онлайн-школа',16000,14),I('rest','Ресторан / доставка',11000,9),I('event','Мероприятие / афиша',5500,5),I('saas','Сайт сервиса / SaaS',9000,8),I('real','Недвижимость',10000,9),I('med','Клиника / врач',8000,7),I('auto','Автосервис / авто',6500,5),I('fit','Фитнес / спорт',6000,5),I('beauty','Салон красоты',5500,4),I('web3','Крипто / Web3',9500,8),I('game','Игровой проект',9000,8),I('fund','Благотворительность',5000,4),I('dir','Каталог / доска объявлений',15000,14),I('wed','Свадебное приглашение',3500,3),I('link','Страница-ссылки (link in bio)',1500,1)]},
+{k:'blocks',t:'Блоки и страницы',kind:'multi',items:[I('hero','Главный экран',0,0),I('about','О нас',500,0),I('serv','Услуги',700,0),I('price','Цены и тарифы',700,0),I('gal','Галерея',900,1),I('rev','Отзывы',600,0),I('faq','FAQ',400,0),I('team','Команда',600,0),I('cases','Кейсы',900,1),I('map','Контакты и карта',500,0),I('timer','Таймер акции',600,0),I('quiz','Квиз-опрос',2500,2),I('calc','Калькулятор цены',3000,2),I('video','Видео-блок',600,0),I('news','Новости',1200,1),I('partn','Партнёры',400,0),I('adv','Преимущества',400,0),I('steps','Как мы работаем',500,0),I('count','Счётчики цифр',600,0),I('slider','Слайдер',900,1),I('cmp','Сравнение тарифов',900,0),I('banner','Баннер-акция',500,0),I('subs','Подписка на новости',600,0),I('docs','Документы и сертификаты',500,0),I('soc','Соцсети',300,0),I('vac','Вакансии',800,1),I('tabs','Вкладки',500,0),I('pop','Всплывающее окно',600,0),I('cta','Призыв к действию',300,0),I('logos','Логотипы клиентов',400,0),I('map3','Схема проезда',600,0)]},
+{k:'feats',t:'Функции',kind:'multi',items:[I('pay','Онлайн-оплата',3500,2),I('cart','Корзина',2500,2),I('admin','Админ-панель',5000,4),I('lk','Личный кабинет',4500,3),I('auth','Вход через Telegram / Google',2000,1),I('lang','Мультиязычность',2500,2),I('seo','SEO-оптимизация',2000,2),I('an','Аналитика',800,0),I('chat','Онлайн-чат',1500,1),I('form','Формы заявок',500,0),I('tgn','Уведомления в Telegram',800,0),I('crm','Интеграция с CRM',3500,3),I('mail','Email-рассылка',1500,1),I('promo','Промокоды и скидки',1800,1),I('search','Умный поиск',1500,1),I('dark','Тёмная тема',700,0),I('pwa','Установка как приложение',2200,2),I('cook','Баннер cookie',300,0),I('blogf','Блог с редактором',2500,2),I('sub','Подписки',3500,3),I('ai','ИИ-помощник на сайте',4500,3),I('ab','Мини-игра / геймификация',3000,3),I('wa','Кнопка WhatsApp / Telegram',300,0),I('cb','Заказ обратного звонка',600,0),I('fav','Избранное',1200,1),I('cmpr','Сравнение товаров',1800,1),I('filt','Фильтры и сортировка',2000,1),I('rate','Рейтинги и оценки',1500,1),I('cmt','Комментарии',2000,2),I('sms','SMS-уведомления',1200,1),I('qr','QR-коды',700,0),I('pdf','Генерация PDF (счета, договоры)',2500,2),I('cal','Календарь записи',3500,3),I('imap','Интерактивная карта',1500,1),I('2fa','Двухфакторная защита',2000,1),I('back','Автобэкапы',1000,0),I('imp','Импорт товаров из Excel',2000,1),I('stock','Учёт склада',3500,3),I('deliv','Расчёт доставки',3000,2),I('cash','Кешбэк и бонусы',3000,2),I('ref','Реферальная программа',3000,2),I('voice','Голосовой поиск',1800,1),I('cms','Удобная CMS для правок',3500,3),I('spd','Ускорение загрузки',1500,1),I('rec','Рекомендации товаров',3000,2),I('wish','Лист желаний',900,0),I('tel','Телеграм Mini App версия',6000,5)]},
+{k:'style',t:'Стиль',kind:'radio',items:[I('min','Минимализм',0,0),I('neon','Неон',1200,1),I('glass','Стекло',1200,1),I('brut','Брутализм',800,0),I('dark','Тёмный премиум',1000,1),I('light','Светлый воздушный',0,0),I('retro','Ретро / 90-е',900,1),I('grad','Градиенты',800,0),I('mono','Монохром',0,0),I('pastel','Пастельный',500,0),I('cyber','Киберпанк',1500,1),I('lux','Люкс / золото',1500,1),I('comic','Комикс',1200,1),I('news','Газетный',600,0),I('swiss','Швейцарский',300,0),I('glitch','Глитч',1200,1),I('aur','Аврора',1000,1),I('paper','Бумага',400,0),I('term','Терминал',700,0),I('vapor','Вейпорвейв',1000,1),I('y2k','Y2K',900,1),I('soft','Мягкий неоморфизм',900,1)]},
+{k:'anim',t:'Анимации',kind:'multi',items:[I('a1','Анимированные кнопки',600,0),I('a2','Живые обои',1500,1),I('a3','Появление при скролле',700,0),I('a4','Частицы',1200,1),I('a5','3D-эффекты',3500,3),I('a6','Курсор-эффект',500,0),I('a7','Анимированный логотип',900,1),I('a8','Параллакс',1200,1),I('a9','Прелоадер',500,0),I('a10','Анимированный градиент',700,0),I('a11','Бегущие счётчики',500,0),I('a12','Эффекты при наведении',500,0),I('a13','Плавные переходы страниц',1500,1),I('a14','Lottie-анимации',1800,1),I('a15','Печатающийся текст',400,0),I('a16','Бегущая строка',300,0),I('a17','Магнитные кнопки',700,0)]},
+{k:'integ',t:'Интеграции',kind:'multi',items:[I('i1','Яндекс.Метрика',300,0),I('i2','Google Analytics',300,0),I('i3','ЮKassa',1500,1),I('i4','СБП',1500,1),I('i5','CloudPayments',1500,1),I('i6','Bitrix24',2500,2),I('i7','amoCRM',2500,2),I('i8','Google Sheets',1200,1),I('i9','1С',6000,5),I('i10','СДЭК',2000,2),I('i11','Почта России',2000,2),I('i12','reCAPTCHA',300,0),I('i13','Telegram-бот для заявок',1000,1),I('i14','VK Pixel',300,0),I('i15','Email-сервис',900,0),I('i16','Webhook / API',1500,1)]},
+{k:'extra',t:'Дополнительно',kind:'multi',items:[I('x1','Регистрация домена',400,0),I('x2','Хостинг на год',1500,0),I('x3','SSL-сертификат',0,0),I('x4','Корпоративная почта',800,0),I('x5','Разработка логотипа',2500,2),I('x6','Фирменный стиль',5000,4),I('x7','Написание текстов',2000,2),I('x8','Наполнение контентом',1500,1),I('x9','Обучение работе с сайтом',800,0),I('x10','Поддержка 1 месяц',1200,0),I('x11','Перенос сайта',1500,1),I('x12','Английская версия',2000,2)]},
+{k:'colors',t:'Цвета (до 4, можно градиент)',kind:'swatch',items:['#e11d2e','#ff5566','#b91c1c','#7f1d1d','#ff8a3d','#f97316','#f2c14e','#facc15','#a3e635','#4ade80','#10b981','#14b8a6','#22d3ee','#38bdf8','#3b82f6','#6366f1','#a78bfa','#8b5cf6','#d946ef','#f472b6','#fb7185','#f5eaea','#9ca3af','#111111']},
+{k:'btn',t:'Стиль кнопок',kind:'radio',items:[I('flat','Плоские',0,0),I('key','Клавиши (с нажатием)',300,0),I('line','Контурные',0,0),I('glass','Стеклянные',400,0),I('neon','Неоновое свечение',600,0),I('grad','Градиентные',400,0),I('pixel','Пиксельные',500,0),I('pill','Таблетки',0,0),I('3d','Объёмные 3D',600,0),I('soft','Мягкие',200,0),I('under','Текстовые с линией',0,0),I('sharp','Острые',0,0)]},
+{k:'radius',t:'Скругления',kind:'radio',items:[I('0','Острые углы',0,0),I('sm','Слабые',0,0),I('md','Средние',0,0),I('lg','Крупные',0,0),I('xl','Круглые',0,0)]},
+{k:'font',t:'Шрифт',kind:'radio',items:[I('modern','Современный',0,0),I('wide','Широкий (заголовки)',0,0),I('mono','Моноширинный',0,0),I('serif','Книжный (с засечками)',0,0),I('black','Плотный жирный',0,0)]},
+{k:'bgt',t:'Фон страницы',kind:'radio',items:[I('solid','Сплошной',0,0),I('grad','Градиент',300,0),I('grid','Сетка',400,0),I('part','Частицы',900,1),I('wave','Волны',900,1),I('aur','Аврора',900,1),I('noise','Зерно / шум',300,0),I('video','Видео-фон',1500,1)]},
+{k:'head',t:'Шапка и меню',kind:'radio',items:[I('fixed','Закреплённая',0,0),I('trans','Прозрачная',200,0),I('side','Боковое меню',800,1),I('burger','Бургер-меню',300,0),I('mega','Мега-меню',1200,1),I('bottom','Нижняя панель (мобильная)',600,0)]},
+{k:'cardst',t:'Карточки',kind:'radio',items:[I('flat','Плоские',0,0),I('border','С рамкой',0,0),I('shadow','С тенью',200,0),I('glass','Стеклянные',400,0),I('lift','Поднимаются при наведении',300,0),I('tilt','Наклон 3D',900,1)]},
+{k:'theme',t:'Тема',kind:'radio',items:[I('dark','Тёмная',0,0),I('light','Светлая',0,0),I('auto','Авто по системе',300,0),I('toggle','С переключателем',500,0)]},
+{k:'icons',t:'Иконки',kind:'radio',items:[I('line','Линейные',0,0),I('fill','Залитые',0,0),I('emoji','Эмодзи',0,0),I('duo','Двухцветные',400,0),I('anim','Анимированные',900,1)]},
+{k:'rush',t:'Срочность',kind:'radio',items:[I('std','Стандартно',0,0),I('fast','Быстрее (+30%)',0,0,'x1.3'),I('now','Срочно (+60%)',0,0,'x1.6')]},
+{k:'notes',t:'Свои пожелания',kind:'text',ph:'Например: хочу страницу с тарифами и секретную админку'}]},
+bot:{name:'Бот',steps:[
+{k:'plat',t:'Платформа',kind:'radio',items:[I('tg','Telegram',0,0),I('ds','Discord',1000,1),I('vk','VK',1000,1),I('wa','WhatsApp',2500,2),I('multi','Несколько платформ',4000,3),I('max','MAX',1500,1),I('viber','Viber',1500,1),I('widget','Виджет на сайте',1500,1)]},
+{k:'type',t:'Тип бота',kind:'radio',items:[I('shop','Магазин',7000,6),I('sup','Поддержка',4500,4),I('book','Запись на услуги',6000,5),I('quiz','Квиз / викторина',4000,3),I('mod','Модератор чата',3500,3),I('inf','Информер',2500,2),I('ai','ИИ-ассистент',8000,6),I('music','Музыка / медиа',5000,4),I('game','Игровой',7000,6),I('crm','CRM / заявки',6500,5),I('edu','Обучающий',6000,5),I('ref','Реферальный',5500,4),I('news','Новостной / канал',3000,2),I('fin','Учёт финансов',5000,4),I('job','Поиск работы',5000,4),I('form','Анкеты и опросы',3000,2),I('don','Донаты',3500,3),I('lot','Розыгрыши',4000,3),I('tick','Билеты на события',6500,5),I('rem','Напоминания',3000,2),I('tr','Переводчик',3500,3),I('fl','Файлообмен',4000,3),I('dat','Знакомства',7000,6),I('fit','Фитнес-тренер',6000,5)]},
+{k:'cmds',t:'Команды',kind:'multi',items:[I('/start','Приветствие',0,0,'/start'),I('/help','Помощь',200,0,'/help'),I('/menu','Меню',400,0,'/menu'),I('/catalog','Каталог',1200,1,'/catalog'),I('/cart','Корзина',1200,1,'/cart'),I('/order','Оформление заказа',1500,1,'/order'),I('/pay','Оплата',2500,2,'/pay'),I('/profile','Профиль',900,0,'/profile'),I('/support','Связь с оператором',900,0,'/support'),I('/faq','Частые вопросы',400,0,'/faq'),I('/book','Запись',1500,1,'/book'),I('/stats','Статистика',1000,1,'/stats'),I('/ref','Реферальная ссылка',1200,1,'/ref'),I('/bonus','Бонусы',1000,1,'/bonus'),I('/promo','Промокод',800,0,'/promo'),I('/lang','Смена языка',900,0,'/lang'),I('/ask','Вопрос ИИ',2500,2,'/ask'),I('/ban','Бан / мут',700,0,'/ban'),I('/rules','Правила',200,0,'/rules'),I('/feedback','Отзыв',500,0,'/feedback'),I('/top','Рейтинг',900,1,'/top'),I('/daily','Ежедневная награда',1000,1,'/daily'),I('/admin','Админ-меню',2500,2,'/admin'),I('/cancel','Отмена',100,0,'/cancel'),I('/about','О нас',200,0,'/about'),I('/contacts','Контакты',200,0,'/contacts'),I('/price','Цены',400,0,'/price'),I('/services','Услуги',600,0,'/services'),I('/track','Отслеживание заказа',1500,1,'/track'),I('/wishlist','Избранное',900,0,'/wishlist'),I('/search','Поиск',1200,1,'/search'),I('/settings','Настройки',800,0,'/settings'),I('/notify','Уведомления',800,0,'/notify'),I('/sub','Подписка',1500,1,'/sub'),I('/donate','Донат',1200,1,'/donate'),I('/giveaway','Розыгрыш',1500,1,'/giveaway'),I('/quiz','Викторина',1500,1,'/quiz'),I('/poll','Опрос',800,0,'/poll'),I('/report','Пожаловаться',500,0,'/report'),I('/warn','Предупреждение',600,0,'/warn'),I('/mute','Мут',600,0,'/mute'),I('/kick','Исключить',600,0,'/kick'),I('/translate','Перевод',2000,1,'/translate'),I('/weather','Погода',800,0,'/weather'),I('/balance','Баланс',900,0,'/balance'),I('/buy','Купить',1500,1,'/buy'),I('/tickets','Билеты',1500,1,'/tickets'),I('/schedule','Расписание',1200,1,'/schedule'),I('/invite','Пригласить друга',1000,0,'/invite'),I('/points','Баллы',900,0,'/points')]},
+{k:'cust',t:'Свои команды',kind:'cmdadd'},
+{k:'feats',t:'Функции',kind:'multi',items:[I('db','База данных',1500,1),I('adm','Админ-панель в боте',3000,2),I('web','Веб-панель управления',5000,4),I('bc','Рассылки',1500,1),I('sub','Проверка подписки на канал',700,0),I('ref','Реферальная система',1800,1),I('lang','Мультиязычность',1800,1),I('st','Статистика и аналитика',1500,1),I('ai','Подключение ИИ',3500,2),I('cap','Капча / антиспам',900,0),I('sch','Отложенные сообщения',1200,1),I('inl','Inline-режим',1500,1),I('wapp','Mini App (веб-приложение)',6000,5),I('pay','Приём платежей',3500,2),I('role','Роли и права',1200,1),I('exp','Экспорт в Excel',800,0),I('not','Напоминания',1200,1),I('file','Работа с файлами',1200,1),I('crm','Интеграция с CRM',3500,3),I('log','Логи и мониторинг',900,0),I('voice','Распознавание голоса',3000,2),I('img','Генерация картинок',3500,2),I('flood','Антифлуд',700,0),I('kw','Автоответ по ключевым словам',900,0),I('fsm','Многошаговые диалоги',1500,1),I('geo','Геолокация',1200,1),I('qr','QR-коды',700,0),I('promo','Промокоды',1000,1),I('rate','Рейтинги',1200,1),I('ach','Достижения',1500,1),I('bk','Бэкап базы',900,0),I('ab','A/B-рассылки',1800,1),I('utm','UTM-метки',800,0),I('gs','Выгрузка в Google Sheets',1200,1),I('api','Свой API / вебхуки',2000,2),I('age','Проверка возраста',600,0),I('trial','Пробный период',1200,1),I('sec','Шифрование данных',1500,1)]},
+{k:'ui',t:'Интерфейс',kind:'multi',items:[I('u1','Кнопки под сообщением',0,0),I('u2','Клавиатура-меню',300,0),I('u3','Пагинация списков',700,0),I('u4','Фото-галереи',700,0),I('u5','Карусель товаров',1500,1),I('u6','Стикеры и эмодзи',300,0),I('u7','Голосовые ответы',1500,1),I('u8','Приветственная картинка',400,0),I('u9','Глубокие ссылки',600,0),I('u10','Индикатор «печатает…»',200,0),I('u11','Прогресс-бар заказа',900,0),I('u12','Капча на кнопках',600,0),I('u13','Темы оформления',1000,1),I('u14','Форматирование текста',200,0)]},
+{k:'tone',t:'Тон общения бота',kind:'radio',items:[I('friend','Дружелюбный',0,0),I('biz','Деловой',0,0),I('fun','С юмором',200,0),I('strict','Строгий',0,0),I('game','Игровой',300,0),I('min','Лаконичный',0,0)]},
+{k:'emo',t:'Эмодзи в сообщениях',kind:'radio',items:[I('none','Без эмодзи',0,0),I('few','Немного',0,0),I('some','Умеренно',0,0),I('lots','Много',0,0)]},
+{k:'host',t:'Размещение',kind:'radio',items:[I('own','У вас',0,0),I('our','На нашем сервере (мес.)',700,0),I('help','Помощь с настройкой',1000,0),I('vps','Деплой на VPS',1200,1),I('mon','Мониторинг 24/7',1500,0)]},
+{k:'sup',t:'Дополнительно',kind:'multi',items:[I('s1','Аватар и описание бота',500,0),I('s2','Написание текстов',1500,1),I('s3','Инструкция для админа',600,0),I('s4','Обучение работе',800,0),I('s5','Поддержка 1 месяц',1200,0),I('s6','Передача исходного кода',2500,0),I('s7','Тестирование',900,0),I('s8','Доработки по списку',1500,1)]},
+{k:'rush',t:'Срочность',kind:'radio',items:[I('std','Стандартно',0,0),I('fast','Быстрее (+30%)',0,0,'x1.3'),I('now','Срочно (+60%)',0,0,'x1.6')]},
+{k:'notes',t:'Свои пожелания',kind:'text',ph:'Опишите, что должен делать бот'}]}
+};
+const BS=k=>CFG.bot.steps.find(s=>s.k===k);
+const addG=(k,g,str)=>str.split(';').forEach(r=>{const a=r.split('|');BS(k).items.push(I(a[0],a[1],+a[2],+(a[3]||0),a[0][0]==='/'?a[0]:'',g))});
+CFG.bot.steps.splice(1,0,{k:'cat',t:'Направление бота',kind:'radio',items:[I('chat','Чат-бот',0,0),I('cons','Консультант',0,0),I('sale','Продажи и магазин',0,0),I('supp','Поддержка клиентов',0,0),I('modr','Модерация чатов',0,0),I('fun','Игры и развлечения',0,0),I('edu','Образование',0,0),I('fin','Финансы и учёт',0,0),I('auto','Автоматизация бизнеса',0,0),I('media','Медиа и каналы',0,0),I('serv','Услуги и запись',0,0),I('util','Утилиты',0,0),I('hr','HR и рекрутинг',0,0),I('comm','Сообщества',0,0)]});
+addG('type','Консультанты','k_law|Юридический консультант|6000|5;k_med|Справочный бот по здоровью|6000|5;k_biz|Бизнес-консультант|6000|5;k_it|IT-поддержка|5500|4;k_edu|Консультант по обучению|5500|4;k_hr|HR-консультант|5000|4;k_habit|Помощник по привычкам и целям|4500|3;k_fin|Финансовый консультант|6000|5;k_sales|Виртуальный менеджер продаж|7000|6;k_travel|Турагент-консультант|6000|5');
+addG('type','Чат-боты','c_faq|FAQ-чат-бот|3000|2;c_ai|Разговорный ИИ-собеседник|8000|6;c_card|Бот-визитка|2000|1;c_voice|Голосовой чат-бот|7000|5;c_anon|Анонимный чат|5000|4;c_tr|Чат-переводчик|4000|3;c_role|Ролевой чат с персонажами|7000|6;c_group|Бот для групповых чатов|4000|3;c_welcome|Бот-приветствие и онбординг|3000|2;c_feedback|Бот сбора отзывов|3000|2');
+addG('type','Продажи','s_menu|Меню и доставка еды|7000|6;s_digital|Продажа цифровых товаров|6500|5;s_sub|Продажа подписок|6000|5;s_auction|Аукцион|8000|7;s_lead|Приём заявок и лидов|4000|3;s_pre|Предзаказы|5000|4;s_market|Мини-маркетплейс|12000|10;s_gift|Подарочные сертификаты|4500|3');
+addG('type','Услуги и запись','v_salon|Запись в салон красоты|5500|4;v_clinic|Запись к врачу|6000|5;v_taxi|Заказ такси и трансфера|9000|8;v_rent|Аренда|6500|5;v_repair|Заявки на ремонт|5000|4;v_courier|Курьерская служба|8000|7;v_event|Запись на мероприятия|5000|4;v_coach|Запись к тренеру|5000|4');
+addG('type','Утилиты','u_weather|Погода|2000|1;u_cur|Курсы валют|2500|2;u_conv|Конвертер величин|2000|1;u_qr|QR и штрихкоды|2000|1;u_pdf|Работа с PDF|4000|3;u_link|Сокращатель ссылок|2500|2;u_remind|Напоминалка|3000|2;u_notes|Заметки|3000|2;u_todo|Планировщик задач|4000|3;u_price|Мониторинг цен|7000|6');
+addG('type','Модерация','m_anti|Антиспам и антирейд|4000|3;m_welcome|Приветствие и капча|3000|2;m_rules|Правила и штрафы|3500|3;m_log|Логи чата|3500|3;m_clean|Автоочистка чата|3000|2;m_levels|Уровни и активность участников|5000|4');
+addG('type','Игры','g_rpg|RPG-игра в чате|9000|8;g_show|Викторина-шоу|5000|4;g_fun|Весёлые мини-игры|5000|4;g_pet|Виртуальный питомец|6000|5;g_lotto|Лото и бинго|4500|3;g_tap|Тапалка|6000|5;g_text|Текстовый квест|7000|6;g_battle|Битвы и дуэли|7000|6');
+addG('type','Образование','e_lang|Изучение языков|6500|5;e_test|Тесты и экзамены|5000|4;e_course|Курсы с уроками|8000|7;e_cards|Карточки для запоминания|4500|3;e_hw|Помощник по домашним заданиям|6000|5;e_kids|Бот для детей (безопасный режим)|7000|6');
+addG('type','Финансы','f_budget|Бюджет и расходы|5000|4;f_invoice|Счета и акты|6000|5;f_crypto|Курсы криптовалют|4000|3;f_donate|Сбор донатов|5000|4;f_split|Деление расходов в компании|4500|3');
+addG('type','Медиа','d_news|Агрегатор новостей|5000|4;d_post|Автопостинг в каналы|5500|4;d_pod|Подкасты и аудио|5000|4;d_poll|Голосования|3000|2;d_meme|Мемы и картинки|3000|2;d_digest|Рассылка-дайджест|3500|3');
+addG('type','HR','h_resume|Приём резюме|5000|4;h_vac|Вакансии|5000|4;h_screen|Скрининг-тест кандидатов|5500|4;h_hr|HR-бот для сотрудников|6000|5');
+addG('cmds','Магазин','/sale|Акции|600;/new|Новинки|500;/hits|Хиты продаж|600;/categories|Категории|700;/brand|Бренды|600;/compare|Сравнение|1000;/checkout|Оформить покупку|1200;/discount|Моя скидка|700;/refund|Возврат|1200;/history|История заказов|1000;/reviews|Отзывы о товаре|1000;/delivery|Доставка|800;/pickup|Самовывоз|800;/size|Подбор размера|1000;/preorder|Предзаказ|1200;/cartclear|Очистить корзину|300');
+addG('cmds','Поддержка','/ticket|Создать обращение|900;/status|Статус обращения|900;/operator|Позвать оператора|1000;/callback|Заказать звонок|900;/guide|Инструкция|500;/rate|Оценить поддержку|500;/complaint|Жалоба|600;/hours|Часы работы|300;/address|Адрес|300;/map|Карта проезда|600;/chat|Чат с менеджером|1200');
+addG('cmds','Модерация','/unban|Разбан|500;/unmute|Снять мут|500;/pin|Закрепить|400;/unpin|Открепить|300;/del|Удалить сообщение|400;/purge|Очистить чат|800;/slowmode|Медленный режим|700;/lock|Закрыть чат|600;/unlock|Открыть чат|500;/captcha|Проверка капчей|900;/whitelist|Белый список|700;/blacklist|Чёрный список|700;/filter|Фильтр слов|900;/welcome|Текст приветствия|500;/goodbye|Текст прощания|400;/warns|Список предупреждений|600;/staff|Список админов|400');
+addG('cmds','Игры','/play|Играть|800;/roll|Кубик|300;/coin|Монетка|200;/duel|Дуэль|1200;/inventory|Инвентарь|1000;/level|Уровень|800;/quest|Задания|1200;/battle|Битва|1500;/rank|Рейтинг игроков|900;/pet|Питомец|1200;/slots|Автомат (без денег)|900;/trivia|Викторина|1000');
+addG('cmds','Обучение','/lesson|Урок|1200;/test|Тест|1200;/homework|Домашнее задание|1000;/dict|Словарь|900;/word|Слово дня|600;/progress|Мой прогресс|900;/certificate|Сертификат|1500;/course|Курсы|1000;/flashcards|Карточки|1000');
+addG('cmds','Финансы','/expense|Добавить расход|800;/income|Добавить доход|800;/budget|Бюджет|1000;/usd|Курс доллара|500;/crypto|Курсы криптовалют|700;/invoice|Выставить счёт|1200;/withdraw|Вывод средств|1500;/deposit|Пополнить|1200;/cashback|Кешбэк|1000');
+addG('cmds','Утилиты','/remind|Напомнить|900;/note|Заметка|600;/notes|Мои заметки|600;/todo|Список дел|900;/timer|Таймер|500;/calc|Калькулятор|600;/convert|Конвертер|700;/qr|Создать QR|600;/short|Сократить ссылку|700;/time|Время|300;/id|Мой ID|200;/ping|Проверка связи|200;/random|Случайное число|300;/horoscope|Гороскоп|600;/dice|Бросок кубиков|300');
+addG('cmds','ИИ','/gpt|Диалог с ИИ|2000;/image|Создать картинку|2500;/voice|Голосовой ответ|2000;/summary|Краткий пересказ|1500;/improve|Улучшить текст|1500;/tts|Озвучить текст|1500;/stt|Текст из голоса|1500;/idea|Идея|1000');
+addG('cmds','Админ','/broadcast|Рассылка|1500;/users|Список пользователей|800;/export|Экспорт данных|800;/logs|Логи|700;/block|Блокировка пользователя|700;/addadmin|Добавить админа|700;/stats_day|Статистика за день|900;/backup|Резервная копия|900;/maintenance|Режим обслуживания|600');
+addG('feats','Продажи и оплата','f_cart|Корзина в боте|1500|1;f_stock|Остатки на складе|2000|2;f_cashback|Кешбэк|1800|1;f_renew|Автопродление подписок|2500|2;f_inv|Счета и чеки|1500|1;f_part|Оплата частями|2000|2;f_crypto|Приём криптовалюты|3000|2;f_sbp|СБП|2000|1;f_dyn|Динамические скидки|1500|1;f_aband|Напоминание о брошенной корзине|1800|1;f_up|Допродажи|1500|1;f_bundle|Наборы товаров|1500|1');
+addG('feats','Общение','f_lang5|Интерфейс на 5+ языках|2500|2;f_op|Переключение на живого оператора|2500|2;f_grp|Работа в группах и каналах|1500|1;f_thr|Темы и ветки|1000|1;f_rem|Напоминания по времени|1200|1;f_poll|Опросы и голосования|1000|1;f_form|Анкеты с проверкой ответов|1500|1;f_tpl|Шаблоны ответов|800|0;f_menu|Динамическое меню|1200|1;f_hello|Приветствие новых участников|700|0;f_pm|Рассылка в личные сообщения|1000|1');
+addG('feats','Безопасность','f_2fa|Подтверждение входа|1500|1;f_wl|Белый список пользователей|800|0;f_lim|Ограничение запросов|900|0;f_audit|Журнал действий админов|1200|1;f_gdpr|Согласие на обработку данных|800|0;f_bl|Чёрный список|800|0;f_keys|Безопасное хранение ключей|1000|1');
+addG('feats','Данные и аналитика','f_dash|Дашборд статистики|3500|3;f_funnel|Воронка продаж|2500|2;f_cohort|Удержание и когорты|3000|3;f_csv|Выгрузка в CSV|800|0;f_notion|Выгрузка в Notion|1500|1;f_air|Airtable|1500|1;f_sheet|Синхронизация таблиц|1500|1;f_hook|Входящие вебхуки|1500|1;f_cron|Задания по расписанию|1200|1');
+addG('feats','ИИ','f_rag|Ответы по вашей базе знаний|5000|4;f_avoice|Голосовой ассистент|4000|3;f_aimg|Генерация изображений|3500|2;f_asum|Пересказ текстов|2500|2;f_atr|Автоперевод сообщений|2000|1;f_amod|ИИ-модерация|3500|3;f_apers|Свой характер бота|1500|1;f_amem|Память диалога|2500|2;f_aocr|Текст с фотографий|3000|2');
+addG('feats','Продвижение','f_contest|Конкурсы и розыгрыши|2000|2;f_qrad|QR-ссылки для рекламы|700|0;f_lead|Лид-магнит и сбор контактов|1200|1;f_nps|Оценка удовлетворённости|1200|1;f_src|Отслеживание источников|1000|1;f_trig|Триггерные цепочки|2500|2;f_seg|Сегментация аудитории|2000|2;f_funnel2|Автоворонка|3500|3');
+for(const s of CFG.bot.steps)if(s.items)for(const i of s.items)i.price=Math.round(i.price*0.5/10)*10;
+const DEF={site:{type:'land',blocks:['hero','serv','price','form'],feats:['form','an'],style:'min',anim:['a1'],integ:[],extra:[],accent:'#e11d2e',colors:['#e11d2e'],grad:false,angle:135,btn:'key',radius:'md',font:'modern',bgt:'solid',head:'fixed',cardst:'border',theme:'dark',icons:'line',rush:'std',notes:''},
+bot:{plat:'tg',cat:'chat',type:'shop',cmds:['/start','/help','/menu','/catalog'],cust:[],feats:['db','bc'],ui:['u1'],sup:[],tone:'friend',emo:'some',host:'own',rush:'std',notes:''}};
+const S={mode:'site',site:null,bot:null,pay:'once',per:1};
+function load(){for(const m of ['site','bot']){const d=JSON.parse(JSON.stringify(DEF[m]));S[m]=d}}
+load();
+const items=(m,k)=>CFG[m].steps.find(s=>s.k===k).items;
+const find=(m,k,id)=>items(m,k).find(i=>i.id===id);
+function render(){
+const m=S.mode,st=S[m];
+$('#tabSite').setAttribute('aria-selected',m==='site');$('#tabBot').setAttribute('aria-selected',m==='bot');
+let h='';
+for(const s of CFG[m].steps){
+h+=`<div class="step"><h3>${s.t}${s.kind==='multi'?`<small>выбрано: ${st[s.k].length}</small>`:''}</h3>`;
+if(s.kind==='radio'||s.kind==='multi'){const hasG=s.items.some(x=>x.g);let lg=null;if(s.items.length>30)h+='<input type="text" class="flt" placeholder="Поиск по списку…" aria-label="Поиск" style="margin-bottom:10px">';h+='<div class="chips">';
+for(const i of s.items){if(hasG){const gn=i.g||'Основные';if(gn!==lg){lg=gn;h+=`<div class="gh" style="flex-basis:100%;font:700 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:10px">${gn}</div>`}}const on=s.kind==='radio'?st[s.k]===i.id:st[s.k].includes(i.id);
+h+=`<label class="chip"><input type="${s.kind==='radio'?'radio':'checkbox'}" name="${m}-${s.k}" data-k="${s.k}" data-id="${i.id}"${on?' checked':''}><span>${i.hint&&i.hint[0]==='/'?'<b class="mono" style="color:var(--red2);font-size:12px">'+i.hint+'</b>':''}${i.label}${i.price?`<i>+${i.price}</i>`:''}</span></label>`}
+h+='</div>'}
+else if(s.kind==='swatch'){h+='<div class="swatches">'+s.items.map(c=>`<button class="sw" data-sw="${c}" style="background:${c}" aria-label="Цвет ${c}" aria-pressed="${st.colors.includes(c)}"></button>`).join('')+`<input type="color" id="custCol" value="${st.colors[0]}" aria-label="Свой цвет" style="width:34px;height:34px;border:0;background:none;padding:0;cursor:pointer"></div><div class="addrow" style="align-items:center;flex-wrap:wrap"><label class="chip"><input type="checkbox" id="gradOn"${st.grad?' checked':''}><span>Градиент</span></label><input type="range" id="angle" min="0" max="360" value="${st.angle}" style="flex:1;min-width:120px" aria-label="Угол градиента"><span class="mono muted" id="angV">${st.angle}°</span></div><div id="gradBar" style="height:32px;border-radius:10px;margin-top:12px;border:1px solid var(--line);background:${gradCss(st)}"></div><p class="muted" style="font-size:12px;margin-top:8px">Выбрано цветов: ${st.colors.length} из 4. Первый цвет основной. Без градиента цвета идут полосами.</p>`}
+else if(s.kind==='text'){h+=`<textarea id="notes" rows="3" placeholder="${s.ph}">${st.notes.replace(/</g,'&lt;')}</textarea>`}
+else if(s.kind==='cmdadd'){h+='<div class="chips" id="custList">'+st.cust.map((c,i)=>`<span class="chip"><span>${c}<i data-rm="${i}" style="cursor:pointer;color:var(--red2)">✕</i></span></span>`).join('')+`</div><div class="addrow"><input type="text" id="custIn" placeholder="/mycommand" maxlength="24"><button class="btn ghost" id="custAdd" style="padding:10px 16px">Добавить</button></div>`}
+h+='</div>'}
+$('#opts').innerHTML=h;update();
+}
+function calc(){
+const m=S.mode,st=S[m];let sum=0,days=0,lines=[];
+for(const s of CFG[m].steps){
+if(s.kind==='radio'){const i=find(m,s.k,st[s.k]);if(i&&s.k!=='rush'){sum+=i.price;days+=i.days;lines.push([s.t+': '+i.label,i.price])}}
+else if(s.kind==='multi'){for(const id of st[s.k]){const i=find(m,s.k,id);sum+=i.price;days+=i.days*0.6;if(i.price)lines.push([i.label,i.price])}}
+else if(s.kind==='cmdadd'){for(const c of st.cust){sum+=80;days+=.5;lines.push(['Команда '+c,80])}}}
+const r=st.rush==='fast'?1.3:st.rush==='now'?1.6:1;
+if(r>1){lines.push(['Срочность ×'+r,Math.round(sum*(r-1))])}
+sum=Math.round(sum*r/10)*10;days=Math.max(1,Math.ceil(days/(r>1?r:1)));
+return{sum,days,lines}}
+function update(){
+const c=calc(),pr=pricing(c);$('#price').firstChild.textContent=pr.main;$('#eta').textContent=pr.sub+' · срок: около '+c.days+' дн.';
+$('#sum').innerHTML=c.lines.map(l=>`<div><span>${l[0]}</span><b>${l[1]?'+'+l[1]:''}</b></div>`).join('');
+preview()}
+function preview(){
+const m=S.mode,st=S[m],p=$('#preview');
+if(m==='site'){
+const ac=st.accent,tn=find('site','type',st.type).label;
+let h=`<div class="browser"><div class="bar"><i></i><i></i><i></i><span>yoursite.ru</span></div><div class="pv" style="--ac:${ac};--r:${RAD[st.radius]}px;font-family:${FONT[st.font]}"><div class="b hero2" style="background:${gradCss(st)}"><b>${tn}</b><span class="pb pb-${st.btn}" style="--bg2:${gradCss(st)}">Кнопка</span> ${st.style==='neon'?'Неоновый':st.style==='glass'?'Стеклянный':st.style==='brut'?'Грубый':'Чистый'} стиль</div>`;
+for(const id of st.blocks){const i=find('site','blocks',id);h+=`<div class="b"><b>блок</b>${i.label}</div>`}
+for(const id of st.feats){const i=find('site','feats',id);h+=`<div class="b"><b>функция</b>${i.label}</div>`}
+p.innerHTML=h+'</div></div>'}
+else{
+const pl=find('bot','plat',st.plat).label,all=[...st.cmds,...st.cust];
+p.innerHTML=`<div class="phone"><div class="top"><i></i>${find('bot','type',st.type).label} · ${pl}</div><div class="msgs" id="pm"></div><div class="cmds" id="pc">${all.map(c=>`<button data-c="${c}">${c}</button>`).join('')||'<span class="muted" style="font-size:11px">Добавьте команды</span>'}</div></div>`;
+botSay('Привет! Я бот на '+pl+'. Нажмите на команду ниже.')}}
+const REPLY={'/start':'Добро пожаловать! Выберите действие в меню.','/help':'Доступные команды показаны ниже.','/menu':'Меню: каталог · корзина · профиль','/catalog':'Каталог: 12 товаров. Выберите категорию.','/cart':'В корзине 2 товара. Оформить?','/order':'Заказ принят. Мы свяжемся с вами.','/pay':'Ссылка на оплату отправлена.','/profile':'Ваш профиль: бонусы 120.','/support':'Оператор подключится через минуту.','/ask':'Спросите что угодно, я отвечу.','/stats':'Сегодня: 48 новых пользователей.','/admin':'Админ-меню: рассылка, статистика, роли.','/ref':'Ваша ссылка: t.me/bot?start=ref','/bonus':'Баланс бонусов: 120.','/book':'Выберите дату и время.','/daily':'Награда получена: +10.'};
+function botSay(t,u){const b=$('#pm');if(!b)return;if(u)b.insertAdjacentHTML('beforeend',`<div class="m u"></div>`),b.lastChild.textContent=u;b.insertAdjacentHTML('beforeend','<div class="m b"></div>');b.lastChild.textContent=t;b.scrollTop=b.scrollHeight}
+</script>
+<script>
+function orderText(){const m=S.mode,st=S[m],c=calc(),L=[`Заказ с сайта SKAYLL: ${CFG[m].name}`];
+for(const s of CFG[m].steps){
+if(s.kind==='radio'){L.push(s.t+': '+find(m,s.k,st[s.k]).label)}
+else if(s.kind==='multi'&&st[s.k].length){L.push(s.t+': '+st[s.k].map(id=>find(m,s.k,id).label).join(', '))}
+else if(s.kind==='cmdadd'&&st.cust.length){L.push('Свои команды: '+st.cust.join(', '))}
+else if(s.kind==='swatch'){L.push('Цвета: '+st.colors.join(', ')+(st.colors.length>1?(st.grad?' (градиент '+st.angle+'°)':' (полосами)'):''))}
+else if(s.kind==='text'&&st.notes.trim()){L.push('Пожелания: '+st.notes.trim())}}
+const pr=pricing(c);L.push('Покупка: '+(S.pay==='month'?'помесячно, '+S.per+' мес':'навсегда'));L.push(`Ориентировочно: ${pr.main}${S.pay==='month'?' ('+pr.sub+')':''}, срок около ${c.days} дн.`);return L.join('\n')}
+function copyText(t,ok){const fb=()=>{const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');toast(ok)}catch(e){toast('Выделите текст и скопируйте вручную')}a.remove()};
+if(navigator.clipboard)navigator.clipboard.writeText(t).then(()=>toast(ok),fb);else fb()}
+function openTg(t){copyText(t,'ТЗ скопировано. Вставьте его в чат, если оно не появилось');const a=document.createElement('a');a.href=TG+'?text='+encodeURIComponent(t.slice(0,1500));a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove()}
+$('#opts').addEventListener('change',e=>{const t=e.target;if(!t.dataset.k)return;const st=S[S.mode],k=t.dataset.k;
+if(t.type==='radio')st[k]=t.dataset.id;else{const a=st[k],i=a.indexOf(t.dataset.id);i<0?a.push(t.dataset.id):a.splice(i,1);t.closest('.step').querySelector('small').textContent='выбрано: '+a.length}
+update()});
+const RAD={'0':0,sm:4,md:8,lg:14,xl:22},FONT={modern:'Manrope,sans-serif',wide:'Unbounded,sans-serif',mono:'JetBrains Mono,monospace',serif:'Georgia,serif',black:'Arial Black,sans-serif'};
+function gradCss(st){const c=st.colors||[st.accent];return st.grad&&c.length>1?`linear-gradient(${st.angle}deg,${c.join(',')})`:c.length>1?`linear-gradient(90deg,${c.map((x,i)=>x+' '+(i*100/c.length)+'% '+((i+1)*100/c.length)+'%').join(',')})`:c[0]}
+function gb(){const b=$('#gradBar');if(b)b.style.background=gradCss(S[S.mode])}
+$('#opts').addEventListener('input',e=>{const t=e.target,st=S[S.mode];if(t.id==='notes')st.notes=t.value;if(t.classList.contains('flt')){const q=t.value.trim().toLowerCase(),bx=t.closest('.step');bx.querySelectorAll('.chip').forEach(c=>{c.style.display=!q||c.textContent.toLowerCase().includes(q)?'':'none'});bx.querySelectorAll('.gh').forEach(g=>{g.style.display=q?'none':''})}if(t.id==='angle'){st.angle=+t.value;$('#angV').textContent=t.value+'°';gb();update()}if(t.id==='custCol'){st.colors[0]=t.value;st.accent=t.value;gb();update()}});
+$('#opts').addEventListener('change',e=>{const t=e.target,st=S[S.mode];if(t.id==='gradOn'){st.grad=t.checked;gb();update()}});
+document.head.insertAdjacentHTML('beforeend','<style>.pv .b{border-radius:var(--r,8px)}.pb{display:inline-block;padding:4px 11px;font:700 10px var(--mono);margin:6px 8px 4px 0;color:#fff;background:var(--ac)}.pb-flat{border-radius:3px}.pb-key{border-radius:6px;box-shadow:0 3px 0 rgba(0,0,0,.5)}.pb-line{background:none;border:1px solid var(--ac);color:var(--ac);border-radius:4px}.pb-glass{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);border-radius:8px}.pb-neon{background:none;border:1px solid var(--ac);box-shadow:0 0 10px var(--ac),inset 0 0 6px var(--ac);border-radius:6px}.pb-grad{background:var(--bg2);border-radius:6px}.pb-pixel{border-radius:0;box-shadow:3px 3px 0 #000;border:2px solid #000}.pb-pill{border-radius:20px}.pb-3d{border-radius:6px;box-shadow:0 4px 0 rgba(0,0,0,.55),0 8px 12px rgba(0,0,0,.4)}.pb-soft{background:rgba(255,255,255,.14);border-radius:10px;color:var(--ac)}.pb-under{background:none;color:var(--ac);border-bottom:2px solid var(--ac);padding-inline:0;border-radius:0}.pb-sharp{border-radius:0}</style>');
+$('#opts').addEventListener('click',e=>{const t=e.target,st=S[S.mode];
+if(t.dataset.sw){const c=t.dataset.sw,ix=st.colors.indexOf(c);if(ix>=0){if(st.colors.length>1)st.colors.splice(ix,1)}else if(st.colors.length>=4){toast('Максимум 4 цвета');return}else st.colors.push(c);st.accent=st.colors[0];render()}
+if(t.dataset.rm!==undefined){st.cust.splice(+t.dataset.rm,1);render()}
+if(t.id==='custAdd')addCust()});
+$('#opts').addEventListener('keydown',e=>{if(e.target.id==='custIn'&&e.key==='Enter'){e.preventDefault();addCust()}});
+function addCust(){const v=$('#custIn').value.trim().toLowerCase().replace(/[^a-z0-9_а-яё/]/gi,'');if(!v)return;const c=v.startsWith('/')?v:'/'+v,st=S.bot;
+if(st.cust.includes(c)||st.cmds.includes(c)){toast('Такая команда уже есть');return}if(st.cust.length>=15){toast('Максимум 15 своих команд');return}
+st.cust.push(c);render();$('#custIn').focus()}
+$('#tabSite').onclick=()=>{S.mode='site';render()};$('#tabBot').onclick=()=>{S.mode='bot';render()};
+$('#order').onclick=()=>openTg(orderText());
+$('#copy').onclick=()=>copyText(orderText(),'ТЗ скопировано');
+$('#reset').onclick=()=>{S[S.mode]=JSON.parse(JSON.stringify(DEF[S.mode]));render();toast('Сброшено')};
+$('#toChat').onclick=()=>{openChat();chatBot('Ваш проект: '+calc().sum+' ₽ (ориентировочно). Нажмите «Отправить в Telegram», чтобы передать заказ.');};
+$('#preview').addEventListener('click',e=>{const c=e.target.dataset.c;if(c)botSay(REPLY[c]||'Команда '+c+' работает. Ответ настраивается под вас.',c)});
+document.addEventListener('click',e=>{const p=e.target.dataset.plan;if(!p)return;
+const pr={'Старт':['land',['hero','serv','form'],['form']],'Бизнес':['corp',['hero','serv','price','faq','map'],['admin','pay','tgn','an']],'Максимум':['shop',['hero','serv','price','rev','faq'],['admin','pay','cart','lk','crm','seo','ai']]}[p];
+S.mode='site';S.site=Object.assign(JSON.parse(JSON.stringify(DEF.site)),{type:pr[0],blocks:pr[1],feats:pr[2]});render();$('#builder').scrollIntoView();toast('Пакет «'+p+'» загружен в конструктор')});
+/* features grid */
+const F=[['⚡','Конструктор с ценой','Отмечаете функции и сразу видите стоимость и срок.'],['⌨','Живое превью','Сайт и диалог бота меняются, пока вы выбираете.'],['✦','Свои команды','Добавляйте любые команды для бота.'],['◐','Живые обои','Четыре режима фона. Переключайте кнопкой «Обои».'],['₽','Онлайн-оплата','Карты, СБП, криптовалюта, подписки.'],['☰','Админ-панели','Управляйте заказами, товарами и пользователями.'],['✉','Рассылки','Сообщения по сегментам и по расписанию.'],['◎','ИИ-помощники','Бот или сайт отвечает клиентам сам.'],['▦','Аналитика','Посетители, конверсия, продажи.'],['⚙','CRM и API','Подключение к вашим сервисам.'],['☁','Хостинг','Размещение и домен под ключ.'],['✓','Поддержка','Правки и новые функции после запуска.']];
+$('#featGrid').innerHTML=F.map(f=>`<div class="card"><div class="ic">${f[0]}</div><h3>${f[1]}</h3><p>${f[2]}</p></div>`).join('');
+$('#mq').innerHTML=['Лендинги','Магазины','Telegram-боты','Админ-панели','Оплата','Рассылки','ИИ','Мини-приложения','Аналитика','Анимации','CRM','Квизы'].map(t=>`<span>${t}</span>`).join('').repeat(2);
+/* shots */
+$('#shotShop').innerHTML=Array.from({length:6},(_, i)=>`<div style="border:1px solid var(--line);border-radius:8px;padding:6px;display:grid;gap:5px"><div style="height:34px;border-radius:5px;background:linear-gradient(135deg,var(--red),#2a1318);opacity:${1-i*.1}"></div><span class="ln" style="position:static;width:80%"></span><span class="ln r" style="position:static;width:40%"></span></div>`).join('');
+$('#shotChart').innerHTML=[40,65,50,80,60,95,75].map((h,i)=>`<div style="flex:1;height:${h}%;background:var(--red);border-radius:5px 5px 0 0;opacity:${.4+i*.09};animation:grow2 2.4s ${i*.15}s infinite alternate ease-in-out;transform-origin:bottom"></div>`).join('');
+document.head.insertAdjacentHTML('beforeend','<style>@keyframes grow2{from{transform:scaleY(.5)}to{transform:scaleY(1)}}</style>');
+(function(){const d=[['b','/start'],['u','/catalog'],['b','Выберите категорию'],['u','Кроссовки'],['b','Нашёл 8 моделей. Показать?']];let i=0;const b=$('#shotBot');
+function step(){if(i>=d.length){setTimeout(()=>{b.innerHTML='';i=0;step()},2500);return}const x=d[i++];b.insertAdjacentHTML('beforeend',`<div class="m ${x[0]}">${x[1]}</div>`);setTimeout(step,1100)}step()})();
+/* keys */
+const kb=$('#keys');'SKAYLL'.split('').forEach((c,i)=>{const k=document.createElement('div');k.className='key';k.dataset.k=c;k.style.setProperty('--i',i);k.textContent=c;kb.appendChild(k)});
+function hit(k){k.classList.add('on');setTimeout(()=>k.classList.remove('on'),160)}
+kb.addEventListener('click',e=>{if(e.target.dataset.k)hit(e.target)});
+$('#enter').onclick=()=>{hit($('#enter'));location.hash='#builder'};
+document.addEventListener('keydown',e=>{if(/INPUT|TEXTAREA/.test(document.activeElement.tagName))return;const c=e.key.toUpperCase();
+$$('.key[data-k="'+c+'"]').forEach(hit);if(e.key==='Enter'&&!document.activeElement.closest('button,a'))hit($('#enter'))});
+/* wallpapers */
+const WP=['частицы','сетка','волны','свечение'];let wp=0;const cv=$('#bg'),cx=cv.getContext('2d');let W,H,P=[];
+const still=matchMedia('(prefers-reduced-motion:reduce)').matches;
+function size(){const r=devicePixelRatio||1;W=cv.width=innerWidth*r;H=cv.height=innerHeight*r;cx.setTransform(1,0,0,1,0,0);P=Array.from({length:Math.min(90,Math.round(innerWidth/14))},()=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.5*r,vy:(Math.random()-.5)*.5*r,r:(Math.random()*1.6+.6)*r}))}
+function draw(t){cx.fillStyle='#0a0507';cx.fillRect(0,0,W,H);const r=devicePixelRatio||1;
+if(wp===0){for(const p of P){p.x=(p.x+p.vx+W)%W;p.y=(p.y+p.vy+H)%H;cx.fillStyle='rgba(255,85,102,.7)';cx.beginPath();cx.arc(p.x,p.y,p.r,0,7);cx.fill()}
+for(let i=0;i<P.length;i++)for(let j=i+1;j<P.length;j++){const a=P[i],b=P[j],d=Math.hypot(a.x-b.x,a.y-b.y);if(d<130*r){cx.strokeStyle=`rgba(225,29,46,${.28*(1-d/(130*r))})`;cx.beginPath();cx.moveTo(a.x,a.y);cx.lineTo(b.x,b.y);cx.stroke()}}}
+else if(wp===1){const g=48*r,o=(t/40)%g;cx.strokeStyle='rgba(225,29,46,.16)';cx.lineWidth=r;cx.beginPath();for(let x=-g+o;x<W;x+=g){cx.moveTo(x,0);cx.lineTo(x,H)}for(let y=-g+o;y<H;y+=g){cx.moveTo(0,y);cx.lineTo(W,y)}cx.stroke();
+const gr=cx.createRadialGradient(W/2,H/2,0,W/2,H/2,W/1.4);gr.addColorStop(0,'rgba(10,5,7,0)');gr.addColorStop(1,'rgba(10,5,7,.9)');cx.fillStyle=gr;cx.fillRect(0,0,W,H)}
+else if(wp===2){for(let k=0;k<5;k++){cx.beginPath();for(let x=0;x<=W;x+=12){const y=H*.55+Math.sin(x/(180*r)+t/1200+k)*40*r*(1+k*.3)+k*28*r;x?cx.lineTo(x,y):cx.moveTo(x,y)}cx.strokeStyle=`rgba(225,29,46,${.5-k*.08})`;cx.lineWidth=2*r;cx.stroke()}}
+else{for(let k=0;k<3;k++){const x=W*(.3+.4*Math.sin(t/4000+k*2)),y=H*(.4+.3*Math.cos(t/5000+k*3)),g=cx.createRadialGradient(x,y,0,x,y,Math.max(W,H)*.45);g.addColorStop(0,'rgba(225,29,46,.3)');g.addColorStop(1,'rgba(225,29,46,0)');cx.fillStyle=g;cx.fillRect(0,0,W,H)}}
+if(!still)requestAnimationFrame(draw)}
+size();addEventListener('resize',()=>{size();if(still)draw(0)});requestAnimationFrame(draw);
+$('#wpBtn').onclick=()=>{wp=(wp+1)%WP.length;$('#wpName').textContent=WP[wp];if(still)draw(0)};
+/* chat */
+function addMsg(c,t){const b=$('#cm'),d=document.createElement('div');d.className='m '+c;d.textContent=t;b.appendChild(d);b.scrollTop=b.scrollHeight;return d}
+function chatBot(t){const d=addMsg('b','…');setTimeout(()=>{d.textContent=t;$('#cm').scrollTop=1e5},450)}
+function openChat(){startPoll();$('#chat').hidden=false;$('#chatBtn').hidden=true;if(!$('#cm').children.length){chatBot(API?'Привет! Напишите вопрос, и поддержка ответит прямо здесь. Быстрые ответы по ценам и срокам: кнопки ниже.':'Привет! Я помощник SKAYLL. Подскажу по ценам и срокам. Чтобы передать заказ менеджеру, нажмите «Отправить в Telegram».');quick()}$('#ci').focus()}
+function quick(){$('#cq').innerHTML=['Сколько стоит?','Какие сроки?','Что вы делаете?'].map(q=>`<button type="button">${q}</button>`).join('')+'<button type="button" data-tg="1" style="border-color:var(--red)">Отправить в Telegram</button>'}
+$('#chatBtn').onclick=openChat;$('#chatX').onclick=()=>{stopPoll();$('#chat').hidden=true;$('#chatBtn').hidden=false};
+function ask(q){addMsg('u',q);const l=q.toLowerCase();let r;
+if(/цен|стоим|сколько|руб/.test(l))r='Сайты от 600 ₽, боты от 300 ₽. Можно платить помесячно, от 190 ₽/мес. В конструкторе сейчас: '+fmt(calc().sum)+' (ориентировочно).';
+else if(/срок|быстро|когда|дн/.test(l))r='Простой проект занимает 2–5 дней. Сложный магазин или бот с ИИ — до двух недель. Срочная работа дороже на 30–60%.';
+else if(/делает|умеет|услуг|что вы/.test(l))r='Сайты (лендинги, магазины, порталы) и боты для Telegram, Discord, VK и WhatsApp. Всё настраивается в конструкторе выше.';
+else if(/оплат|платит/.test(l))r='Условия оплаты обсуждаются в Telegram с @skayllik до начала работы.';
+else if(/привет|здрав/.test(l))r='Здравствуйте! Чем помочь?';
+else r='Лучше обсудить это напрямую с менеджером. Нажмите «Отправить в Telegram».';
+chatBot(r)}
+const PER={1:0,3:.05,6:.1,12:.15};
+function pricing(c){if(S.pay!=='month')return{main:fmt(c.sum),sub:'разовая оплата, проект ваш навсегда'};const base=Math.max(190,Math.round(c.sum*0.12/10)*10),pm=Math.round(base*(1-PER[S.per])/10)*10;return{main:fmt(pm)+'/мес',sub:'за '+S.per+' мес: '+fmt(pm*S.per)}}
+function payUI(){$('#payOnce').setAttribute('aria-selected',S.pay==='once');$('#payMonth').setAttribute('aria-selected',S.pay==='month');$('#perRow').hidden=S.pay!=='month';$('#perRow').innerHTML=[1,3,6,12].map(n=>`<label class="chip"><input type="radio" name="per" value="${n}"${S.per===n?' checked':''}><span>${n} мес${PER[n]?`<i>−${PER[n]*100}%</i>`:''}</span></label>`).join('')}
+$('#payOnce').onclick=()=>{S.pay='once';payUI();update()};
+$('#payMonth').onclick=()=>{S.pay='month';payUI();update()};
+$('#perRow').addEventListener('change',e=>{S.per=+e.target.value;update()});
+payUI();
+$('#cf').onsubmit=e=>{e.preventDefault();const v=$('#ci').value.trim();if(!v)return;$('#ci').value='';if(!API){ask(v);return}live(v)};
+$('#cq').onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.tg)openTg(orderText());else ask(b.textContent)};
+/* живой чат поддержки: сайт -> Cloudflare Worker -> Telegram-бот -> обратно на сайт */
+const API=''; /* сюда вставьте адрес воркера, например https://skayll-chat.ИМЯ.workers.dev */
+let sid='',last=0,pt=null;
+try{sid=localStorage.getItem('sk_sid')||'';last=+localStorage.getItem('sk_last')||0}catch(e){}
+if(!sid){const a=new Uint8Array(12);crypto.getRandomValues(a);sid=[...a].map(x=>(x%36).toString(36)).join('')+Date.now().toString(36);try{localStorage.setItem('sk_sid',sid)}catch(e){}}
+async function live(t){addMsg('u',t);try{const r=await fetch(API+'/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sid,text:t})});if(!r.ok)throw 0;startPoll()}catch(e){chatBot('Не удалось отправить. Напишите нам в Telegram @skayllik или на skayllik61@gmail.com.')}}
+async function poll(){try{const r=await fetch(API+'/poll?sid='+sid+'&after='+last),j=await r.json();for(const m of j.msgs){addMsg('b',m.text);last=m.id}try{localStorage.setItem('sk_last',last)}catch(e){}}catch(e){}}
+function startPoll(){if(API&&!pt){poll();pt=setInterval(poll,4000)}}
+function stopPoll(){clearInterval(pt);pt=null}
+render();
+</script>
