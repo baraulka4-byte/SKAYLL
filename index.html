@@ -1,4 +1,3 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>SKAYLL</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap">
@@ -190,6 +189,7 @@ footer{padding-block:48px;border-top:1px solid var(--line);display:flex;justify-
 <aside class="side">
 <div class="panel">
 <p class="eyebrow">Ваш проект</p>
+<div class="tabs" id="payTabs" style="margin:12px 0 8px"><button class="tab" id="payOnce" aria-selected="true" type="button">Навсегда</button><button class="tab" id="payMonth" aria-selected="false" type="button">Помесячно</button></div><div class="chips" id="perRow" hidden style="margin-bottom:8px"></div>
 <div class="price" id="price">0 ₽<small id="eta">срок: —</small></div>
 <div class="sum" id="sum"></div>
 <div class="row"><button class="btn" id="order">Заказать в Telegram</button><button class="btn ghost" id="toChat">Обсудить в чате</button></div>
@@ -231,9 +231,9 @@ footer{padding-block:48px;border-top:1px solid var(--line);display:flex;justify-
 <section id="plans">
 <div class="sec-head"><p class="eyebrow">Тарифы</p><h2>Готовые пакеты</h2><p class="muted">Или соберите свой в конструкторе выше. Цены ориентировочные.</p></div>
 <div class="plans">
-<div class="plan"><h3>Старт</h3><div class="p">от 1 000 ₽</div><ul><li>Лендинг или простой бот</li><li>До 5 блоков или команд</li><li>Форма заявки</li><li>Адаптив под телефон</li></ul><button class="btn ghost" data-plan="Старт">Выбрать</button></div>
-<div class="plan hot"><h3>Бизнес</h3><div class="p">от 3 000 ₽</div><ul><li>Многостраничный сайт или бот с БД</li><li>Админ-панель</li><li>Оплата онлайн</li><li>Уведомления в Telegram</li><li>Аналитика</li></ul><button class="btn" data-plan="Бизнес">Выбрать</button></div>
-<div class="plan"><h3>Максимум</h3><div class="p">от 7 000 ₽</div><ul><li>Магазин, личный кабинет, CRM</li><li>Бот с ИИ и рассылками</li><li>Свой дизайн и анимации</li><li>Приоритетная поддержка</li></ul><button class="btn ghost" data-plan="Максимум">Выбрать</button></div>
+<div class="plan"><h3>Старт</h3><div class="p">от 1 000 ₽</div><p class="muted" style="font-size:13px;margin-top:-8px">или от 190 ₽/мес</p><ul><li>Лендинг или простой бот</li><li>До 5 блоков или команд</li><li>Форма заявки</li><li>Адаптив под телефон</li></ul><button class="btn ghost" data-plan="Старт">Выбрать</button></div>
+<div class="plan hot"><h3>Бизнес</h3><div class="p">от 3 000 ₽</div><p class="muted" style="font-size:13px;margin-top:-8px">или от 360 ₽/мес</p><ul><li>Многостраничный сайт или бот с БД</li><li>Админ-панель</li><li>Оплата онлайн</li><li>Уведомления в Telegram</li><li>Аналитика</li></ul><button class="btn" data-plan="Бизнес">Выбрать</button></div>
+<div class="plan"><h3>Максимум</h3><div class="p">от 7 000 ₽</div><p class="muted" style="font-size:13px;margin-top:-8px">или от 840 ₽/мес</p><ul><li>Магазин, личный кабинет, CRM</li><li>Бот с ИИ и рассылками</li><li>Свой дизайн и анимации</li><li>Приоритетная поддержка</li></ul><button class="btn ghost" data-plan="Максимум">Выбрать</button></div>
 </div>
 </section>
 
@@ -243,6 +243,7 @@ footer{padding-block:48px;border-top:1px solid var(--line);display:flex;justify-
 <details><summary>Цена в конструкторе окончательная?</summary><p>Нет, это оценка. Точную стоимость и сроки мы называем после обсуждения задачи.</p></details>
 <details><summary>Можно добавить функцию, которой нет в списке?</summary><p>Да. В конструкторе есть поле «свои пожелания», а свои команды для бота можно добавить вручную.</p></details>
 <details><summary>На какие платформы делаете ботов?</summary><p>Telegram, Discord, VK и WhatsApp. Выберите платформу в конструкторе бота.</p></details>
+<details><summary>Можно купить не навсегда, а платить помесячно?</summary><p>Да. В конструкторе переключите «Навсегда» на «Помесячно» и выберите срок: при оплате на 3, 6 или 12 месяцев вперёд действует скидка 5%, 10% или 15%.</p></details>
 <details><summary>Что после запуска?</summary><p>Передаём доступы и инструкцию. Поддержка и доработки обсуждаются отдельно.</p></details>
 </section>
 </main>
@@ -263,7 +264,7 @@ const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const TG='https://t.me/skayllik';
 const fmt=n=>n.toLocaleString('ru-RU').replace(/ /g,' ')+' ₽';
 let toastT;const toast=t=>{const e=$('#toast');e.textContent=t;e.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>e.classList.remove('show'),2200)};
-const K=0.2;const I=(id,label,price,days,hint)=>({id,label,price:Math.round(price*K/10)*10,days:days||0,hint:hint||''});
+const K=0.2;const I=(id,label,price,days,hint,g)=>({id,label,price:Math.round(price*K/10)*10,days:days||0,hint:hint||'',g:g||''});
 const CFG={
 site:{name:'Сайт',steps:[
 {k:'type',t:'Тип сайта',kind:'radio',items:[I('land','Лендинг',4000,3),I('shop','Интернет-магазин',14000,12),I('card','Сайт-визитка',3000,2),I('corp','Корпоративный',12000,10),I('port','Портфолио',4500,4),I('blog','Блог / медиа',7000,6),I('book','Запись / бронирование',10000,8),I('edu','Онлайн-школа',16000,14),I('rest','Ресторан / доставка',11000,9),I('event','Мероприятие / афиша',5500,5),I('saas','Сайт сервиса / SaaS',9000,8),I('real','Недвижимость',10000,9),I('med','Клиника / врач',8000,7),I('auto','Автосервис / авто',6500,5),I('fit','Фитнес / спорт',6000,5),I('beauty','Салон красоты',5500,4),I('web3','Крипто / Web3',9500,8),I('game','Игровой проект',9000,8),I('fund','Благотворительность',5000,4),I('dir','Каталог / доска объявлений',15000,14),I('wed','Свадебное приглашение',3500,3),I('link','Страница-ссылки (link in bio)',1500,1)]},
@@ -298,9 +299,39 @@ bot:{name:'Бот',steps:[
 {k:'rush',t:'Срочность',kind:'radio',items:[I('std','Стандартно',0,0),I('fast','Быстрее (+30%)',0,0,'x1.3'),I('now','Срочно (+60%)',0,0,'x1.6')]},
 {k:'notes',t:'Свои пожелания',kind:'text',ph:'Опишите, что должен делать бот'}]}
 };
+const BS=k=>CFG.bot.steps.find(s=>s.k===k);
+const addG=(k,g,str)=>str.split(';').forEach(r=>{const a=r.split('|');BS(k).items.push(I(a[0],a[1],+a[2],+(a[3]||0),a[0][0]==='/'?a[0]:'',g))});
+CFG.bot.steps.splice(1,0,{k:'cat',t:'Направление бота',kind:'radio',items:[I('chat','Чат-бот',0,0),I('cons','Консультант',0,0),I('sale','Продажи и магазин',0,0),I('supp','Поддержка клиентов',0,0),I('modr','Модерация чатов',0,0),I('fun','Игры и развлечения',0,0),I('edu','Образование',0,0),I('fin','Финансы и учёт',0,0),I('auto','Автоматизация бизнеса',0,0),I('media','Медиа и каналы',0,0),I('serv','Услуги и запись',0,0),I('util','Утилиты',0,0),I('hr','HR и рекрутинг',0,0),I('comm','Сообщества',0,0)]});
+addG('type','Консультанты','k_law|Юридический консультант|6000|5;k_med|Справочный бот по здоровью|6000|5;k_biz|Бизнес-консультант|6000|5;k_it|IT-поддержка|5500|4;k_edu|Консультант по обучению|5500|4;k_hr|HR-консультант|5000|4;k_habit|Помощник по привычкам и целям|4500|3;k_fin|Финансовый консультант|6000|5;k_sales|Виртуальный менеджер продаж|7000|6;k_travel|Турагент-консультант|6000|5');
+addG('type','Чат-боты','c_faq|FAQ-чат-бот|3000|2;c_ai|Разговорный ИИ-собеседник|8000|6;c_card|Бот-визитка|2000|1;c_voice|Голосовой чат-бот|7000|5;c_anon|Анонимный чат|5000|4;c_tr|Чат-переводчик|4000|3;c_role|Ролевой чат с персонажами|7000|6;c_group|Бот для групповых чатов|4000|3;c_welcome|Бот-приветствие и онбординг|3000|2;c_feedback|Бот сбора отзывов|3000|2');
+addG('type','Продажи','s_menu|Меню и доставка еды|7000|6;s_digital|Продажа цифровых товаров|6500|5;s_sub|Продажа подписок|6000|5;s_auction|Аукцион|8000|7;s_lead|Приём заявок и лидов|4000|3;s_pre|Предзаказы|5000|4;s_market|Мини-маркетплейс|12000|10;s_gift|Подарочные сертификаты|4500|3');
+addG('type','Услуги и запись','v_salon|Запись в салон красоты|5500|4;v_clinic|Запись к врачу|6000|5;v_taxi|Заказ такси и трансфера|9000|8;v_rent|Аренда|6500|5;v_repair|Заявки на ремонт|5000|4;v_courier|Курьерская служба|8000|7;v_event|Запись на мероприятия|5000|4;v_coach|Запись к тренеру|5000|4');
+addG('type','Утилиты','u_weather|Погода|2000|1;u_cur|Курсы валют|2500|2;u_conv|Конвертер величин|2000|1;u_qr|QR и штрихкоды|2000|1;u_pdf|Работа с PDF|4000|3;u_link|Сокращатель ссылок|2500|2;u_remind|Напоминалка|3000|2;u_notes|Заметки|3000|2;u_todo|Планировщик задач|4000|3;u_price|Мониторинг цен|7000|6');
+addG('type','Модерация','m_anti|Антиспам и антирейд|4000|3;m_welcome|Приветствие и капча|3000|2;m_rules|Правила и штрафы|3500|3;m_log|Логи чата|3500|3;m_clean|Автоочистка чата|3000|2;m_levels|Уровни и активность участников|5000|4');
+addG('type','Игры','g_rpg|RPG-игра в чате|9000|8;g_show|Викторина-шоу|5000|4;g_fun|Весёлые мини-игры|5000|4;g_pet|Виртуальный питомец|6000|5;g_lotto|Лото и бинго|4500|3;g_tap|Тапалка|6000|5;g_text|Текстовый квест|7000|6;g_battle|Битвы и дуэли|7000|6');
+addG('type','Образование','e_lang|Изучение языков|6500|5;e_test|Тесты и экзамены|5000|4;e_course|Курсы с уроками|8000|7;e_cards|Карточки для запоминания|4500|3;e_hw|Помощник по домашним заданиям|6000|5;e_kids|Бот для детей (безопасный режим)|7000|6');
+addG('type','Финансы','f_budget|Бюджет и расходы|5000|4;f_invoice|Счета и акты|6000|5;f_crypto|Курсы криптовалют|4000|3;f_donate|Сбор донатов|5000|4;f_split|Деление расходов в компании|4500|3');
+addG('type','Медиа','d_news|Агрегатор новостей|5000|4;d_post|Автопостинг в каналы|5500|4;d_pod|Подкасты и аудио|5000|4;d_poll|Голосования|3000|2;d_meme|Мемы и картинки|3000|2;d_digest|Рассылка-дайджест|3500|3');
+addG('type','HR','h_resume|Приём резюме|5000|4;h_vac|Вакансии|5000|4;h_screen|Скрининг-тест кандидатов|5500|4;h_hr|HR-бот для сотрудников|6000|5');
+addG('cmds','Магазин','/sale|Акции|600;/new|Новинки|500;/hits|Хиты продаж|600;/categories|Категории|700;/brand|Бренды|600;/compare|Сравнение|1000;/checkout|Оформить покупку|1200;/discount|Моя скидка|700;/refund|Возврат|1200;/history|История заказов|1000;/reviews|Отзывы о товаре|1000;/delivery|Доставка|800;/pickup|Самовывоз|800;/size|Подбор размера|1000;/preorder|Предзаказ|1200;/cartclear|Очистить корзину|300');
+addG('cmds','Поддержка','/ticket|Создать обращение|900;/status|Статус обращения|900;/operator|Позвать оператора|1000;/callback|Заказать звонок|900;/guide|Инструкция|500;/rate|Оценить поддержку|500;/complaint|Жалоба|600;/hours|Часы работы|300;/address|Адрес|300;/map|Карта проезда|600;/chat|Чат с менеджером|1200');
+addG('cmds','Модерация','/unban|Разбан|500;/unmute|Снять мут|500;/pin|Закрепить|400;/unpin|Открепить|300;/del|Удалить сообщение|400;/purge|Очистить чат|800;/slowmode|Медленный режим|700;/lock|Закрыть чат|600;/unlock|Открыть чат|500;/captcha|Проверка капчей|900;/whitelist|Белый список|700;/blacklist|Чёрный список|700;/filter|Фильтр слов|900;/welcome|Текст приветствия|500;/goodbye|Текст прощания|400;/warns|Список предупреждений|600;/staff|Список админов|400');
+addG('cmds','Игры','/play|Играть|800;/roll|Кубик|300;/coin|Монетка|200;/duel|Дуэль|1200;/inventory|Инвентарь|1000;/level|Уровень|800;/quest|Задания|1200;/battle|Битва|1500;/rank|Рейтинг игроков|900;/pet|Питомец|1200;/slots|Автомат (без денег)|900;/trivia|Викторина|1000');
+addG('cmds','Обучение','/lesson|Урок|1200;/test|Тест|1200;/homework|Домашнее задание|1000;/dict|Словарь|900;/word|Слово дня|600;/progress|Мой прогресс|900;/certificate|Сертификат|1500;/course|Курсы|1000;/flashcards|Карточки|1000');
+addG('cmds','Финансы','/expense|Добавить расход|800;/income|Добавить доход|800;/budget|Бюджет|1000;/usd|Курс доллара|500;/crypto|Курсы криптовалют|700;/invoice|Выставить счёт|1200;/withdraw|Вывод средств|1500;/deposit|Пополнить|1200;/cashback|Кешбэк|1000');
+addG('cmds','Утилиты','/remind|Напомнить|900;/note|Заметка|600;/notes|Мои заметки|600;/todo|Список дел|900;/timer|Таймер|500;/calc|Калькулятор|600;/convert|Конвертер|700;/qr|Создать QR|600;/short|Сократить ссылку|700;/time|Время|300;/id|Мой ID|200;/ping|Проверка связи|200;/random|Случайное число|300;/horoscope|Гороскоп|600;/dice|Бросок кубиков|300');
+addG('cmds','ИИ','/gpt|Диалог с ИИ|2000;/image|Создать картинку|2500;/voice|Голосовой ответ|2000;/summary|Краткий пересказ|1500;/improve|Улучшить текст|1500;/tts|Озвучить текст|1500;/stt|Текст из голоса|1500;/idea|Идея|1000');
+addG('cmds','Админ','/broadcast|Рассылка|1500;/users|Список пользователей|800;/export|Экспорт данных|800;/logs|Логи|700;/block|Блокировка пользователя|700;/addadmin|Добавить админа|700;/stats_day|Статистика за день|900;/backup|Резервная копия|900;/maintenance|Режим обслуживания|600');
+addG('feats','Продажи и оплата','f_cart|Корзина в боте|1500|1;f_stock|Остатки на складе|2000|2;f_cashback|Кешбэк|1800|1;f_renew|Автопродление подписок|2500|2;f_inv|Счета и чеки|1500|1;f_part|Оплата частями|2000|2;f_crypto|Приём криптовалюты|3000|2;f_sbp|СБП|2000|1;f_dyn|Динамические скидки|1500|1;f_aband|Напоминание о брошенной корзине|1800|1;f_up|Допродажи|1500|1;f_bundle|Наборы товаров|1500|1');
+addG('feats','Общение','f_lang5|Интерфейс на 5+ языках|2500|2;f_op|Переключение на живого оператора|2500|2;f_grp|Работа в группах и каналах|1500|1;f_thr|Темы и ветки|1000|1;f_rem|Напоминания по времени|1200|1;f_poll|Опросы и голосования|1000|1;f_form|Анкеты с проверкой ответов|1500|1;f_tpl|Шаблоны ответов|800|0;f_menu|Динамическое меню|1200|1;f_hello|Приветствие новых участников|700|0;f_pm|Рассылка в личные сообщения|1000|1');
+addG('feats','Безопасность','f_2fa|Подтверждение входа|1500|1;f_wl|Белый список пользователей|800|0;f_lim|Ограничение запросов|900|0;f_audit|Журнал действий админов|1200|1;f_gdpr|Согласие на обработку данных|800|0;f_bl|Чёрный список|800|0;f_keys|Безопасное хранение ключей|1000|1');
+addG('feats','Данные и аналитика','f_dash|Дашборд статистики|3500|3;f_funnel|Воронка продаж|2500|2;f_cohort|Удержание и когорты|3000|3;f_csv|Выгрузка в CSV|800|0;f_notion|Выгрузка в Notion|1500|1;f_air|Airtable|1500|1;f_sheet|Синхронизация таблиц|1500|1;f_hook|Входящие вебхуки|1500|1;f_cron|Задания по расписанию|1200|1');
+addG('feats','ИИ','f_rag|Ответы по вашей базе знаний|5000|4;f_avoice|Голосовой ассистент|4000|3;f_aimg|Генерация изображений|3500|2;f_asum|Пересказ текстов|2500|2;f_atr|Автоперевод сообщений|2000|1;f_amod|ИИ-модерация|3500|3;f_apers|Свой характер бота|1500|1;f_amem|Память диалога|2500|2;f_aocr|Текст с фотографий|3000|2');
+addG('feats','Продвижение','f_contest|Конкурсы и розыгрыши|2000|2;f_qrad|QR-ссылки для рекламы|700|0;f_lead|Лид-магнит и сбор контактов|1200|1;f_nps|Оценка удовлетворённости|1200|1;f_src|Отслеживание источников|1000|1;f_trig|Триггерные цепочки|2500|2;f_seg|Сегментация аудитории|2000|2;f_funnel2|Автоворонка|3500|3');
+for(const s of CFG.bot.steps)if(s.items)for(const i of s.items)i.price=Math.round(i.price*0.5/10)*10;
 const DEF={site:{type:'land',blocks:['hero','serv','price','form'],feats:['form','an'],style:'min',anim:['a1'],integ:[],extra:[],accent:'#e11d2e',colors:['#e11d2e'],grad:false,angle:135,btn:'key',radius:'md',font:'modern',bgt:'solid',head:'fixed',cardst:'border',theme:'dark',icons:'line',rush:'std',notes:''},
-bot:{plat:'tg',type:'shop',cmds:['/start','/help','/menu','/catalog'],cust:[],feats:['db','bc'],ui:['u1'],sup:[],tone:'friend',emo:'some',host:'own',rush:'std',notes:''}};
-const S={mode:'site',site:null,bot:null};
+bot:{plat:'tg',cat:'chat',type:'shop',cmds:['/start','/help','/menu','/catalog'],cust:[],feats:['db','bc'],ui:['u1'],sup:[],tone:'friend',emo:'some',host:'own',rush:'std',notes:''}};
+const S={mode:'site',site:null,bot:null,pay:'once',per:1};
 function load(){for(const m of ['site','bot']){const d=JSON.parse(JSON.stringify(DEF[m]));S[m]=d}}
 load();
 const items=(m,k)=>CFG[m].steps.find(s=>s.k===k).items;
@@ -311,9 +342,9 @@ $('#tabSite').setAttribute('aria-selected',m==='site');$('#tabBot').setAttribute
 let h='';
 for(const s of CFG[m].steps){
 h+=`<div class="step"><h3>${s.t}${s.kind==='multi'?`<small>выбрано: ${st[s.k].length}</small>`:''}</h3>`;
-if(s.kind==='radio'||s.kind==='multi'){h+='<div class="chips">';
-for(const i of s.items){const on=s.kind==='radio'?st[s.k]===i.id:st[s.k].includes(i.id);
-h+=`<label class="chip"><input type="${s.kind==='radio'?'radio':'checkbox'}" name="${m}-${s.k}" data-k="${s.k}" data-id="${i.id}"${on?' checked':''}><span>${i.label}${i.price?`<i>+${i.price}</i>`:''}</span></label>`}
+if(s.kind==='radio'||s.kind==='multi'){const hasG=s.items.some(x=>x.g);let lg=null;if(s.items.length>30)h+='<input type="text" class="flt" placeholder="Поиск по списку…" aria-label="Поиск" style="margin-bottom:10px">';h+='<div class="chips">';
+for(const i of s.items){if(hasG){const gn=i.g||'Основные';if(gn!==lg){lg=gn;h+=`<div class="gh" style="flex-basis:100%;font:700 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:10px">${gn}</div>`}}const on=s.kind==='radio'?st[s.k]===i.id:st[s.k].includes(i.id);
+h+=`<label class="chip"><input type="${s.kind==='radio'?'radio':'checkbox'}" name="${m}-${s.k}" data-k="${s.k}" data-id="${i.id}"${on?' checked':''}><span>${i.hint&&i.hint[0]==='/'?'<b class="mono" style="color:var(--red2);font-size:12px">'+i.hint+'</b>':''}${i.label}${i.price?`<i>+${i.price}</i>`:''}</span></label>`}
 h+='</div>'}
 else if(s.kind==='swatch'){h+='<div class="swatches">'+s.items.map(c=>`<button class="sw" data-sw="${c}" style="background:${c}" aria-label="Цвет ${c}" aria-pressed="${st.colors.includes(c)}"></button>`).join('')+`<input type="color" id="custCol" value="${st.colors[0]}" aria-label="Свой цвет" style="width:34px;height:34px;border:0;background:none;padding:0;cursor:pointer"></div><div class="addrow" style="align-items:center;flex-wrap:wrap"><label class="chip"><input type="checkbox" id="gradOn"${st.grad?' checked':''}><span>Градиент</span></label><input type="range" id="angle" min="0" max="360" value="${st.angle}" style="flex:1;min-width:120px" aria-label="Угол градиента"><span class="mono muted" id="angV">${st.angle}°</span></div><div id="gradBar" style="height:32px;border-radius:10px;margin-top:12px;border:1px solid var(--line);background:${gradCss(st)}"></div><p class="muted" style="font-size:12px;margin-top:8px">Выбрано цветов: ${st.colors.length} из 4. Первый цвет основной. Без градиента цвета идут полосами.</p>`}
 else if(s.kind==='text'){h+=`<textarea id="notes" rows="3" placeholder="${s.ph}">${st.notes.replace(/</g,'&lt;')}</textarea>`}
@@ -326,13 +357,13 @@ const m=S.mode,st=S[m];let sum=0,days=0,lines=[];
 for(const s of CFG[m].steps){
 if(s.kind==='radio'){const i=find(m,s.k,st[s.k]);if(i&&s.k!=='rush'){sum+=i.price;days+=i.days;lines.push([s.t+': '+i.label,i.price])}}
 else if(s.kind==='multi'){for(const id of st[s.k]){const i=find(m,s.k,id);sum+=i.price;days+=i.days*0.6;if(i.price)lines.push([i.label,i.price])}}
-else if(s.kind==='cmdadd'){for(const c of st.cust){sum+=150;days+=.5;lines.push(['Команда '+c,150])}}}
+else if(s.kind==='cmdadd'){for(const c of st.cust){sum+=80;days+=.5;lines.push(['Команда '+c,80])}}}
 const r=st.rush==='fast'?1.3:st.rush==='now'?1.6:1;
 if(r>1){lines.push(['Срочность ×'+r,Math.round(sum*(r-1))])}
 sum=Math.round(sum*r/10)*10;days=Math.max(1,Math.ceil(days/(r>1?r:1)));
 return{sum,days,lines}}
 function update(){
-const c=calc();$('#price').firstChild.textContent=fmt(c.sum);$('#eta').textContent='срок: около '+c.days+' дн.';
+const c=calc(),pr=pricing(c);$('#price').firstChild.textContent=pr.main;$('#eta').textContent=pr.sub+' · срок: около '+c.days+' дн.';
 $('#sum').innerHTML=c.lines.map(l=>`<div><span>${l[0]}</span><b>${l[1]?'+'+l[1]:''}</b></div>`).join('');
 preview()}
 function preview(){
@@ -358,7 +389,7 @@ else if(s.kind==='multi'&&st[s.k].length){L.push(s.t+': '+st[s.k].map(id=>find(m
 else if(s.kind==='cmdadd'&&st.cust.length){L.push('Свои команды: '+st.cust.join(', '))}
 else if(s.kind==='swatch'){L.push('Цвета: '+st.colors.join(', ')+(st.colors.length>1?(st.grad?' (градиент '+st.angle+'°)':' (полосами)'):''))}
 else if(s.kind==='text'&&st.notes.trim()){L.push('Пожелания: '+st.notes.trim())}}
-L.push(`Ориентировочно: ${fmt(c.sum)}, срок около ${c.days} дн.`);return L.join('\n')}
+const pr=pricing(c);L.push('Покупка: '+(S.pay==='month'?'помесячно, '+S.per+' мес':'навсегда'));L.push(`Ориентировочно: ${pr.main}${S.pay==='month'?' ('+pr.sub+')':''}, срок около ${c.days} дн.`);return L.join('\n')}
 function copyText(t,ok){const fb=()=>{const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');toast(ok)}catch(e){toast('Выделите текст и скопируйте вручную')}a.remove()};
 if(navigator.clipboard)navigator.clipboard.writeText(t).then(()=>toast(ok),fb);else fb()}
 function openTg(t){copyText(t,'ТЗ скопировано. Вставьте его в чат, если оно не появилось');const a=document.createElement('a');a.href=TG+'?text='+encodeURIComponent(t.slice(0,1500));a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove()}
@@ -368,7 +399,7 @@ update()});
 const RAD={'0':0,sm:4,md:8,lg:14,xl:22},FONT={modern:'Manrope,sans-serif',wide:'Unbounded,sans-serif',mono:'JetBrains Mono,monospace',serif:'Georgia,serif',black:'Arial Black,sans-serif'};
 function gradCss(st){const c=st.colors||[st.accent];return st.grad&&c.length>1?`linear-gradient(${st.angle}deg,${c.join(',')})`:c.length>1?`linear-gradient(90deg,${c.map((x,i)=>x+' '+(i*100/c.length)+'% '+((i+1)*100/c.length)+'%').join(',')})`:c[0]}
 function gb(){const b=$('#gradBar');if(b)b.style.background=gradCss(S[S.mode])}
-$('#opts').addEventListener('input',e=>{const t=e.target,st=S[S.mode];if(t.id==='notes')st.notes=t.value;if(t.id==='angle'){st.angle=+t.value;$('#angV').textContent=t.value+'°';gb();update()}if(t.id==='custCol'){st.colors[0]=t.value;st.accent=t.value;gb();update()}});
+$('#opts').addEventListener('input',e=>{const t=e.target,st=S[S.mode];if(t.id==='notes')st.notes=t.value;if(t.classList.contains('flt')){const q=t.value.trim().toLowerCase(),bx=t.closest('.step');bx.querySelectorAll('.chip').forEach(c=>{c.style.display=!q||c.textContent.toLowerCase().includes(q)?'':'none'});bx.querySelectorAll('.gh').forEach(g=>{g.style.display=q?'none':''})}if(t.id==='angle'){st.angle=+t.value;$('#angV').textContent=t.value+'°';gb();update()}if(t.id==='custCol'){st.colors[0]=t.value;st.accent=t.value;gb();update()}});
 $('#opts').addEventListener('change',e=>{const t=e.target,st=S[S.mode];if(t.id==='gradOn'){st.grad=t.checked;gb();update()}});
 document.head.insertAdjacentHTML('beforeend','<style>.pv .b{border-radius:var(--r,8px)}.pb{display:inline-block;padding:4px 11px;font:700 10px var(--mono);margin:6px 8px 4px 0;color:#fff;background:var(--ac)}.pb-flat{border-radius:3px}.pb-key{border-radius:6px;box-shadow:0 3px 0 rgba(0,0,0,.5)}.pb-line{background:none;border:1px solid var(--ac);color:var(--ac);border-radius:4px}.pb-glass{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);border-radius:8px}.pb-neon{background:none;border:1px solid var(--ac);box-shadow:0 0 10px var(--ac),inset 0 0 6px var(--ac);border-radius:6px}.pb-grad{background:var(--bg2);border-radius:6px}.pb-pixel{border-radius:0;box-shadow:3px 3px 0 #000;border:2px solid #000}.pb-pill{border-radius:20px}.pb-3d{border-radius:6px;box-shadow:0 4px 0 rgba(0,0,0,.55),0 8px 12px rgba(0,0,0,.4)}.pb-soft{background:rgba(255,255,255,.14);border-radius:10px;color:var(--ac)}.pb-under{background:none;color:var(--ac);border-bottom:2px solid var(--ac);padding-inline:0;border-radius:0}.pb-sharp{border-radius:0}</style>');
 $('#opts').addEventListener('click',e=>{const t=e.target,st=S[S.mode];
@@ -426,16 +457,21 @@ function openChat(){$('#chat').hidden=false;$('#chatBtn').hidden=true;if(!$('#cm
 function quick(){$('#cq').innerHTML=['Сколько стоит?','Какие сроки?','Что вы делаете?'].map(q=>`<button type="button">${q}</button>`).join('')+'<button type="button" data-tg="1" style="border-color:var(--red)">Отправить в Telegram</button>'}
 $('#chatBtn').onclick=openChat;$('#chatX').onclick=()=>{$('#chat').hidden=true;$('#chatBtn').hidden=false};
 function ask(q){addMsg('u',q);const l=q.toLowerCase();let r;
-if(/цен|стоим|сколько|руб/.test(l))r='Сайты от 600 ₽, боты от 500 ₽. В конструкторе сейчас: '+fmt(calc().sum)+' (ориентировочно).';
+if(/цен|стоим|сколько|руб/.test(l))r='Сайты от 600 ₽, боты от 300 ₽. Можно платить помесячно, от 190 ₽/мес. В конструкторе сейчас: '+fmt(calc().sum)+' (ориентировочно).';
 else if(/срок|быстро|когда|дн/.test(l))r='Простой проект занимает 2–5 дней. Сложный магазин или бот с ИИ — до двух недель. Срочная работа дороже на 30–60%.';
 else if(/делает|умеет|услуг|что вы/.test(l))r='Сайты (лендинги, магазины, порталы) и боты для Telegram, Discord, VK и WhatsApp. Всё настраивается в конструкторе выше.';
 else if(/оплат|платит/.test(l))r='Условия оплаты обсуждаются в Telegram с @skayllik до начала работы.';
 else if(/привет|здрав/.test(l))r='Здравствуйте! Чем помочь?';
 else r='Лучше обсудить это напрямую с менеджером. Нажмите «Отправить в Telegram».';
 chatBot(r)}
+const PER={1:0,3:.05,6:.1,12:.15};
+function pricing(c){if(S.pay!=='month')return{main:fmt(c.sum),sub:'разовая оплата, проект ваш навсегда'};const base=Math.max(190,Math.round(c.sum*0.12/10)*10),pm=Math.round(base*(1-PER[S.per])/10)*10;return{main:fmt(pm)+'/мес',sub:'за '+S.per+' мес: '+fmt(pm*S.per)}}
+function payUI(){$('#payOnce').setAttribute('aria-selected',S.pay==='once');$('#payMonth').setAttribute('aria-selected',S.pay==='month');$('#perRow').hidden=S.pay!=='month';$('#perRow').innerHTML=[1,3,6,12].map(n=>`<label class="chip"><input type="radio" name="per" value="${n}"${S.per===n?' checked':''}><span>${n} мес${PER[n]?`<i>−${PER[n]*100}%</i>`:''}</span></label>`).join('')}
+$('#payOnce').onclick=()=>{S.pay='once';payUI();update()};
+$('#payMonth').onclick=()=>{S.pay='month';payUI();update()};
+$('#perRow').addEventListener('change',e=>{S.per=+e.target.value;update()});
+payUI();
 $('#cf').onsubmit=e=>{e.preventDefault();const v=$('#ci').value.trim();if(!v)return;$('#ci').value='';ask(v)};
 $('#cq').onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.tg)openTg(orderText());else ask(b.textContent)};
 render();
 </script>
-
-</body></html>
